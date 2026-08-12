@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile — Transpo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/storage.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    (function () {
+      if (!PTB.getCurrentUser()) {
+        location.replace('login.html');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <span class="brand-sm">Transpo</span>
+      <nav class="nav-links">
+        <a href="dashboard.html" class="nav-link">Home</a>
+        <a href="services.html" class="nav-link">Ride</a>
+        <a href="history.html" class="nav-link">History</a>
+        <a href="profile.html" class="nav-link active">Profile</a>
+        <a href="about.html" class="nav-link">About</a>
+      </nav>
+    </header>
+
+        <div class="profile-avatar" id="profileAvatar"></div>
+    <h2 class="profile-name" id="profileName"></h2>
+
+    <div id="alertSuccess" class="alert alert-success" role="status"></div>
+
+    <div style="height:2rem"></div>
+    <div class="card">
+      <form id="profileForm" novalidate>
+        <div class="form-group">
+          <label class="label" for="fullName">Complete Name</label>
+          <input class="input" type="text" id="fullName" name="fullName" autocomplete="name" disabled>
+          <p class="field-error" id="nameError">Please enter your complete name.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="phone">Phone Number</label>
+          <input class="input" type="tel" id="phone" name="phone" autocomplete="tel" disabled>
+          <p class="field-error" id="phoneError">Please enter a valid phone number.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="address">Address</label>
+          <input class="input" type="text" id="address" name="address" autocomplete="street-address" disabled>
+          <p class="field-error" id="addressError">Please enter your address.</p>
+        </div>
+
+        <button type="button" id="editInfoBtn" class="btn btn-primary btn-block">Edit Information</button>
+        <button type="submit" id="updateInfoBtn" class="btn btn-primary btn-block hidden mt-8">Update Information</button>
+        <button type="button" id="cancelBtn" class="btn btn-outline btn-block hidden mt-8">Cancel</button>
+      </form>
+    </div>
+
+    <div class="card mt-16">
+      <div class="muted" style="font-size:13.5px; margin-bottom:14px">
+        Logging out keeps your booking history saved on this device. Log back in anytime with your email and password.
+      </div>
+      <button type="button" id="logoutBtn" class="btn btn-danger btn-block">Log Out</button>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-head">
+        <div class="footer-brand">
+          <span class="brand-sm">Transpo</span>
+          <p>Your ride, booked in seconds.</p>
+        </div>
+        <nav class="footer-links">
+          <a href="dashboard.html">Home</a>
+          <a href="services.html">Ride</a>
+          <a href="history.html">History</a>
+          <a href="profile.html">Profile</a>
+          <a href="about.html">About Us</a>
+        </nav>
+      </div>
+      <div class="footer-contact">
+        <div class="fc-row"><span class="fc-icon">📞</span><span>+63 966 573 5765</span></div>
+        <div class="fc-row"><span class="fc-icon">📍</span><span>Toledo City, Cebu, Philippines</span></div>
+        <div class="fc-row"><span class="fc-icon">📧</span><span>support@transpo.ph</span></div>
+        <div class="fc-row"><span class="fc-icon">📘</span><a href="https://facebook.com/transpo" target="_blank" rel="noopener">facebook.com/transpo</a></div>
+      </div>
+      <div class="footer-bottom">© <span id="footerYear">2026</span> Transpo. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="js/profile.js"></script>
+</body>
+</html>

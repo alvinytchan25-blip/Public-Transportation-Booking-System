@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Ride — Transpo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="js/storage.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    (function () {
+      if (!PTB.getCurrentUser()) {
+        location.replace('login.html');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <span class="brand-sm">Transpo</span>
+      <nav class="nav-links">
+        <a href="dashboard.html" class="nav-link">Home</a>
+        <a href="services.html" class="nav-link">Ride</a>
+        <a href="history.html" class="nav-link">History</a>
+        <a href="profile.html" class="nav-link">Profile</a>
+        <a href="about.html" class="nav-link">About</a>
+      </nav>
+    </header>
+
+    <h1 class="page-title">Book a ride</h1>
+    <p class="page-sub">Tap the map to mark your pickup point, then your destination.</p>
+
+    <div id="serviceBanner" class="service-banner"></div>
+
+    <div class="card">
+      <div class="form-head" style="text-align:center">Fill Out This Form</div>
+      <label class="label">Pick Your Locations</label>
+      <div class="map-block">
+        <span class="map-label">Tap the map — 1st tap = pickup · 2nd tap = destination</span>
+        <div id="rideMap" class="map"></div>
+      </div>
+      <div class="map-legend">
+        <span class="leg"><span class="leg-dot pickup"></span> Pickup</span>
+        <span class="leg"><span class="leg-dot dropoff"></span> Destination</span>
+        <span class="leg">📍 Drag a pin to fine-tune</span>
+      </div>
+
+      <div class="form-group mt-16">
+        <label class="label" for="pickupName">Pickup location</label>
+        <input class="input" type="text" id="pickupName" placeholder="Tap the map to set pickup" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="label" for="destName">Destination</label>
+        <input class="input" type="text" id="destName" placeholder="Tap the map to set destination" autocomplete="off">
+      </div>
+
+      <div id="routeReadout" class="route-readout">
+        <div class="route-row">
+          <span class="rr-icon">📍</span>
+          <span class="rr-text">Pickup: <strong id="pickupOut">—</strong></span>
+        </div>
+        <div class="route-row">
+          <span class="rr-icon">🏁</span>
+          <span class="rr-text">Destination: <strong id="destOut">—</strong></span>
+        </div>
+        <div class="route-row">
+          <span class="rr-icon">📏</span>
+          <span class="rr-text">Distance: <strong id="distOut">—</strong></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="label">Number of Passengers</label>
+        <div class="stepper">
+          <button type="button" id="paxMinus" aria-label="Decrease passengers">−</button>
+          <span class="count" id="paxCount">1</span>
+          <button type="button" id="paxPlus" aria-label="Increase passengers">+</button>
+        </div>
+      </div>
+
+      <div id="fareBoard" class="fare-board hidden">
+        <div class="fare-row"><span>Price per km</span><strong id="fPerKm">—</strong></div>
+        <div class="fare-row"><span>Distance</span><strong id="fDistance">—</strong></div>
+        <div class="fare-row"><span>Price per passenger</span><strong id="fPerPax">—</strong></div>
+        <div class="fare-row"><span>Passengers</span><strong id="fPax">—</strong></div>
+        <div class="fare-total"><span>Total Fare</span><span class="amount" id="fTotal">₱0.00</span></div>
+      </div>
+
+      <p class="muted mt-16" style="font-size:12.5px; text-align:center">
+        Distance is a straight-line estimate between your two points.
+      </p>
+
+      <p id="mapHint" class="muted mt-8" style="font-size:13.5px; text-align:center"></p>
+
+      <div class="mt-16" style="display:flex; gap:10px">
+        <button type="button" id="clearBtn" class="btn btn-outline" style="flex:1">Reset</button>
+        <button type="button" id="confirmBtn" class="btn btn-accent btn-lg" style="flex:2" disabled>
+          Confirm Booking
+        </button>
+      </div>
+    </div>
+
+    <div id="resultArea" class="hidden">
+      <div class="success-msg" id="successMsg">🎉 Booking Confirmed! Your driver will arrive in 10 minutes.</div>
+      <div class="driver-card">
+        <div class="driver-avatar" id="driverInitial">?</div>
+        <div class="driver-name" id="driverName">—</div>
+        <div class="driver-phone" id="driverPhone">—</div>
+        <span class="badge badge-available" id="statusBadge">● Booking Accepted</span>
+      </div>
+      <a href="history.html" class="btn btn-primary btn-block mt-16">View Booking History</a>
+      <button type="button" id="cancelBookingBtn" class="btn btn-danger btn-block mt-8">Cancel Booking</button>
+    </div>
+  </div>
+
+  <div id="loadingOverlay" class="overlay">
+    <div class="overlay-box">
+      <div class="pulse-road">🏍</div>
+      <div class="ov-title">Searching for driver...</div>
+      <div class="ov-sub">Finding the nearest available driver for you.</div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-head">
+        <div class="footer-brand">
+          <span class="brand-sm">Transpo</span>
+          <p>Your ride, booked in seconds.</p>
+        </div>
+        <nav class="footer-links">
+          <a href="dashboard.html">Home</a>
+          <a href="services.html">Ride</a>
+          <a href="history.html">History</a>
+          <a href="profile.html">Profile</a>
+          <a href="about.html">About Us</a>
+        </nav>
+      </div>
+      <div class="footer-contact">
+        <div class="fc-row"><span class="fc-icon">📞</span><span>+63 966 573 5765</span></div>
+        <div class="fc-row"><span class="fc-icon">📍</span><span>Toledo City, Cebu, Philippines</span></div>
+        <div class="fc-row"><span class="fc-icon">📧</span><span>support@transpo.ph</span></div>
+        <div class="fc-row"><span class="fc-icon">📘</span><a href="https://facebook.com/transpo" target="_blank" rel="noopener">facebook.com/transpo</a></div>
+      </div>
+      <div class="footer-bottom">© <span id="footerYear">2026</span> Transpo. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/booking.js"></script>
+</body>
+</html>

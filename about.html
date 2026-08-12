@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us — Transpo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/storage.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    (function () {
+      if (!PTB.getCurrentUser()) {
+        location.replace('login.html');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <span class="brand-sm">Transpo</span>
+      <nav class="nav-links">
+        <a href="dashboard.html" class="nav-link">Home</a>
+        <a href="services.html" class="nav-link">Ride</a>
+        <a href="history.html" class="nav-link">History</a>
+        <a href="profile.html" class="nav-link">Profile</a>
+        <a href="about.html" class="nav-link active">About</a>
+      </nav>
+    </header>
+
+    <section class="hero-card">
+      <div class="about-hero-icon">🚗</div>
+      <h2>About Transpo</h2>
+      <p>Getting where you need to be has never been simpler.</p>
+    </section>
+
+    <div class="card">
+      <h3 class="about-h">Who We Are</h3>
+      <p class="about-p">
+        Transpo is a public transportation booking system designed to connect
+        passengers with available motorcycle and taxi drivers in just a few taps.
+        Our goal is to make city travel fast, affordable, and convenient for everyone.
+      </p>
+    </div>
+
+    <div class="card mt-16">
+      <h3 class="about-h">Our Mission</h3>
+      <p class="about-p">
+        We believe great transport should be effortless. Transpo removes the
+        guesswork from commuting by giving you live pricing, a clear route preview,
+        and a confirmed driver in seconds — all from your browser.
+      </p>
+    </div>
+
+    <div class="card mt-16">
+      <h3 class="about-h">What We Offer</h3>
+      <div class="about-feature">
+        <span class="af-icon">🏍</span>
+        <div>
+          <strong>Motorcycle Rides</strong>
+          <p class="about-p sm">Fast and budget-friendly for solo trips through busy streets.</p>
+        </div>
+      </div>
+      <div class="about-feature">
+        <span class="af-icon">🚕</span>
+        <div>
+          <strong>Taxi Rides</strong>
+          <p class="about-p sm">Spacious and comfortable for groups, luggage, and longer trips.</p>
+        </div>
+      </div>
+      <div class="about-feature">
+        <span class="af-icon">🗺</span>
+        <div>
+          <strong>Tap-to-Set Locations</strong>
+          <p class="about-p sm">Mark your pickup and destination directly on the interactive map.</p>
+        </div>
+      </div>
+      <div class="about-feature">
+        <span class="af-icon">💰</span>
+        <div>
+          <strong>Transparent Fares</strong>
+          <p class="about-p sm">See the full price breakdown before you confirm your booking.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-16">
+      <h3 class="about-h">How It Works</h3>
+      <ol class="about-steps">
+        <li>Create an account or log in to your Transpo profile.</li>
+        <li>Choose a ride type — motorcycle or taxi.</li>
+        <li>Tap the map to set your pickup point and destination.</li>
+        <li>Review the distance and fare, then confirm your booking.</li>
+        <li>Get matched with a driver and track your trip details anytime.</li>
+      </ol>
+    </div>
+
+    <div class="card mt-16">
+      <h3 class="about-h">The System at a Glance</h3>
+      <div class="about-detail">
+        <span class="ad-label">Services</span>
+        <span class="ad-value">Motorcycle &amp; Taxi</span>
+      </div>
+      <div class="about-detail">
+        <span class="ad-label">Pricing</span>
+        <span class="ad-value">Per kilometer + per passenger</span>
+      </div>
+      <div class="about-detail">
+        <span class="ad-label">Location</span>
+        <span class="ad-value">Interactive map with live route estimate</span>
+      </div>
+      <div class="about-detail">
+        <span class="ad-label">Data Storage</span>
+        <span class="ad-value">Saved locally on your device</span>
+      </div>
+      <div class="about-detail">
+        <span class="ad-label">Booking Tracking</span>
+        <span class="ad-value">Full history, active status &amp; cancellation</span>
+      </div>
+    </div>
+
+    <div class="card mt-16">
+      <div class="muted" style="font-size:13.5px; text-align:center">
+        Transpo is a demonstration system. Accounts, fares, and bookings are
+        stored locally in your browser — this system is designed for front-end only, no backend, no database, no internet required.
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-head">
+        <div class="footer-brand">
+          <span class="brand-sm">Transpo</span>
+          <p>Your ride, booked in seconds.</p>
+        </div>
+        <nav class="footer-links">
+          <a href="dashboard.html">Home</a>
+          <a href="services.html">Ride</a>
+          <a href="history.html">History</a>
+          <a href="profile.html">Profile</a>
+          <a href="about.html">About Us</a>
+        </nav>
+      </div>
+      <div class="footer-contact">
+        <div class="fc-row"><span class="fc-icon">📞</span><span>+63 966 573 5765</span></div>
+        <div class="fc-row"><span class="fc-icon">📍</span><span>Toledo City, Cebu, Philippines</span></div>
+        <div class="fc-row"><span class="fc-icon">📧</span><span>support@transpo.ph</span></div>
+        <div class="fc-row"><span class="fc-icon">📘</span><a href="https://facebook.com/transpo" target="_blank" rel="noopener">facebook.com/transpo</a></div>
+      </div>
+      <div class="footer-bottom">© <span id="footerYear">2026</span> Transpo. All rights reserved.</div>
+    </div>
+  </footer>
+</body>
+</html>

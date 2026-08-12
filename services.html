@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choose a Ride — Transpo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/storage.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    (function () {
+      if (!PTB.getCurrentUser()) {
+        location.replace('login.html');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <span class="brand-sm">Transpo</span>
+      <nav class="nav-links">
+        <a href="dashboard.html" class="nav-link">Home</a>
+        <a href="services.html" class="nav-link active">Ride</a>
+        <a href="history.html" class="nav-link">History</a>
+        <a href="profile.html" class="nav-link">Profile</a>
+        <a href="about.html" class="nav-link">About</a>
+      </nav>
+    </header>
+
+    <h1 class="page-title">Choose a ride</h1>
+    <p class="page-sub">Tap a ride to see which drivers are available right now.</p>
+
+    <div id="servicesList"></div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-head">
+        <div class="footer-brand">
+          <span class="brand-sm">Transpo</span>
+          <p>Your ride, booked in seconds.</p>
+        </div>
+        <nav class="footer-links">
+          <a href="dashboard.html">Home</a>
+          <a href="services.html">Ride</a>
+          <a href="history.html">History</a>
+          <a href="profile.html">Profile</a>
+          <a href="about.html">About Us</a>
+        </nav>
+      </div>
+      <div class="footer-contact">
+        <div class="fc-row"><span class="fc-icon">📞</span><span>+63 966 573 5765</span></div>
+        <div class="fc-row"><span class="fc-icon">📍</span><span>Toledo City, Cebu, Philippines</span></div>
+        <div class="fc-row"><span class="fc-icon">📧</span><span>support@transpo.ph</span></div>
+        <div class="fc-row"><span class="fc-icon">📘</span><a href="https://facebook.com/transpo" target="_blank" rel="noopener">facebook.com/transpo</a></div>
+      </div>
+      <div class="footer-bottom">© <span id="footerYear">2026</span> Transpo. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <script src="js/services.js"></script>
+</body>
+</html>
