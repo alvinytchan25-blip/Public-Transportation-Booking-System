@@ -326,6 +326,32 @@ input {
   margin-bottom: 18px;
 }
 
+.logo-badge img {
+  width: 58px;
+  height: 58px;
+  display: block;
+}
+
+.brand-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: center;
+}
+
+.brand-wrap .logo-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  margin-bottom: 0;
+  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.38);
+}
+
+.brand-wrap .logo-badge img {
+  width: 48px;
+  height: 48px;
+}
+
 .brand {
   font-size: 28px;
   font-weight: 800;
@@ -1104,6 +1130,13 @@ input {
   margin: 4px 0 10px;
 }
 
+.driver-proximity {
+  margin-top: 4px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
 .success-msg {
   background: var(--success-soft);
   color: var(--success);
@@ -1120,6 +1153,109 @@ input {
   background: var(--danger-soft);
   color: var(--danger);
   border-color: #fecaca;
+}
+
+/* ---------- Live driver tracking ---------- */
+
+.tracking-card {
+  margin-top: 18px;
+  text-align: left;
+}
+
+.tracking-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.tracking-title {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.tracking-sub {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.track-map {
+  height: 300px;
+  margin-bottom: 6px;
+}
+
+.tracking-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.tracking-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.tracking-row strong {
+  color: var(--text);
+}
+
+.tracking-row .eta-value {
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.driver-bubble {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid #fff;
+  box-shadow: 0 4px 14px rgba(17, 24, 39, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.driver-bubble::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 2px solid rgba(249, 115, 22, 0.55);
+  animation: driver-pulse 1.6s ease-out infinite;
+}
+
+.proximity-tip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 3px 11px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+@keyframes driver-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
 }
 
 /* ---------- Overlay / loading ---------- */

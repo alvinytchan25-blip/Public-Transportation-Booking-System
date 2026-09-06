@@ -317,8 +317,280 @@
       mapHint.textContent = '';
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Booking Confirmed';
+      startTracking(driver);
     }, 2200);
   });
+
+  /* ---------- Live driver tracking (simulation) ---------- */
+
+  var trackMap = null;
+  var trackingTimer = null;
+  var trackActive = false;
+
+  /* Road-following route. Each entry is {lat,lng,dist} where dist is the
+     cumulative drive distance in meters along the road polyline. */
+  var trackToPickup = [];   // driver start -> pickup, road-aware
+  var trackLeg1 = 0;        // total meters on the driver -> pickup leg
+
+  var TRACK_MPS = 25;   // simulated driver speed in m/s
+
+  function trackClamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+
+  function formatTrackDist(m) {
+    return m < 1000 ? Math.round(m) + ' m' : (m / 1000).toFixed(1) + ' km';
+  }
+
+  function etaText(min) {
+    return min < 1 ? 'under a minute' : '~' + min + ' min';
+  }
+
+  /* Convert a lat/lng pair into a flat array usable by OSRM: lng,lat;lng,lat */
+  function osrmCoords(a, b) {
+    return a.lng + ',' + a.lat + ';' + b.lng + ',' + b.lat;
+  }
+
+  /* Request a road-following route from OSRM (free, no key, CORS-enabled).
+     Resolves to an array of {lat,lng,dist} points with cumulative road
+     distance, or null if the request fails or times out. */
+  function fetchOsrmRoute(a, b) {
+    return new Promise(function (resolve) {
+      var settled = false;
+
+      function done(route) {
+        if (!settled) { settled = true; resolve(route); }
+      }
+
+      fetch('https://router.project-osrm.org/route/v1/driving/' +
+        osrmCoords(a, b) + '?overview=full&geometries=geojson')
+        .then(function (res) {
+          if (!res.ok) throw new Error('OSRM bad status');
+          return res.json();
+        })
+        .then(function (data) {
+          var coords = data.routes && data.routes[0] &&
+            data.routes[0].geometry && data.routes[0].geometry.coordinates;
+          if (!coords || !coords.length) throw new Error('OSRM empty route');
+
+          var pts = [];
+          var prev = null;
+          var acc = 0;
+          for (var i = 0; i < coords.length; i++) {
+            var cur = { lat: coords[i][1], lng: coords[i][0] };
+            if (prev) {
+              acc += haversineKm(prev, cur) * 1000;
+            }
+            pts.push({ lat: cur.lat, lng: cur.lng, dist: acc });
+            prev = cur;
+          }
+          /* Make sure the very ends match our picked points exactly so the
+             pins sit on the drawn line. */
+          pts[0].lat = a.lat; pts[0].lng = a.lng; pts[0].dist = 0;
+          var end = pts[pts.length - 1];
+          end.lat = b.lat; end.lng = b.lng;
+          done(pts);
+        })
+        .catch(function () { done(null); });
+
+      /* Don't wait on a stuck request forever */
+      setTimeout(function () { done(null); }, 8000);
+    });
+  }
+
+  /* Straight-line fallback (measured in meters) so tracking still works if
+     OSRM is unreachable or offline. */
+  function straightLeg(a, b) {
+    var pts = [];
+    var steps = 32;
+    for (var s = 0; s <= steps; s++) {
+      var t = s / steps;
+      var cur = {
+        lat: a.lat + (b.lat - a.lat) * t,
+        lng: a.lng + (b.lng - a.lng) * t
+      };
+      cur.dist = haversineKm(a, cur) * 1000;
+      pts.push(cur);
+    }
+    pts[steps].lat = b.lat;
+    pts[steps].lng = b.lng;
+    return pts;
+  }
+
+  function stopTracking() {
+    trackActive = false;
+    if (trackingTimer) {
+      clearInterval(trackingTimer);
+      trackingTimer = null;
+    }
+    if (trackMap) {
+      trackMap.remove();
+      trackMap = null;
+    }
+    trackToPickup = [];
+    trackLeg1 = 0;
+  }
+
+  function startTracking(driver) {
+    stopTracking();
+    trackActive = true;
+
+    /* Simulated driver starts somewhere near the pickup point */
+    var start = {
+      lat: trackClamp(pickup.lat + (Math.random() - 0.5) * 0.045, 10.18, 10.44),
+      lng: trackClamp(pickup.lng + (Math.random() - 0.5) * 0.055, 123.75, 124.04)
+    };
+    var pickupPt = { lat: pickup.lat, lng: pickup.lng };
+
+    var area = document.getElementById('trackingArea');
+    area.classList.remove('hidden');
+
+    var trackEl = document.getElementById('trackMap');
+    trackMap = L.map(trackEl, {
+      zoomControl: true,
+      attributionControl: false,
+      minZoom: 11,
+      maxBounds: [[10.15, 123.72], [10.45, 124.05]],
+      maxBoundsViscosity: 0.8
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(trackMap);
+
+    var routeBounds = L.latLngBounds([
+      L.latLng(start.lat, start.lng),
+      L.latLng(pickupPt.lat, pickupPt.lng)
+    ]);
+
+    setTimeout(function () {
+      trackMap.invalidateSize();
+      trackMap.fitBounds(routeBounds, { padding: [30, 30] });
+    }, 80);
+
+    L.marker(pickupPt, { icon: makeIcon('pickup') }).addTo(trackMap);
+
+    var vehicle = service.type === 'motorcycle' ? '🏍' : '🚕';
+    var driverMarker = L.marker([start.lat, start.lng], {
+      icon: L.divIcon({
+        className: 'leaflet-pin',
+        html: '<div class="driver-bubble">' + vehicle + '</div>',
+        iconSize: [44, 44],
+        iconAnchor: [22, 22]
+      })
+    }).addTo(trackMap);
+
+    /* Live road-following line from the driver to the pickup */
+    var proxLine = L.polyline([start, pickupPt], {
+      color: '#4f46e5',
+      weight: 4,
+      opacity: 0.9
+    }).addTo(trackMap);
+
+    proxLine.bindTooltip('', {
+      permanent: true,
+      direction: 'center',
+      className: 'proximity-tip',
+      opacity: 0.95
+    });
+
+    var subEl = document.getElementById('trackSub');
+    var distEl = document.getElementById('trackDist');
+    var etaEl = document.getElementById('trackEta');
+    var distLabel = document.getElementById('trackDistLabel');
+    var etaLabel = document.getElementById('trackEtaLabel');
+    var badgeEl = document.getElementById('trackBadge');
+    var proxEl = document.getElementById('driverProximity');
+
+    badgeEl.classList.remove('badge-cancelled');
+    badgeEl.classList.add('badge-available');
+    badgeEl.textContent = '● En Route';
+    subEl.textContent = driver.name + ' is heading to your pickup point.';
+    proxEl.textContent = 'Locating ' + driver.name + '...';
+
+    var trackPosition = 0; // current meters traveled
+    var trackArrived = false;
+
+    /* Represent the driver's progress as an index along the to-pickup route,
+       used to (a) move the marker, (b) trim the live line, (c) compute distance. */
+    function driverIndex(route, meters) {
+      var stop = 0;
+      for (var i = 0; i < route.length; i++) {
+        if (route[i].dist >= meters) { stop = i; break; }
+      }
+      if (route[stop].dist < meters) stop = route.length - 1;
+      var lo = Math.max(0, stop - 1);
+      var hi = Math.min(route.length - 1, stop);
+      var span = route[hi].dist - route[lo].dist || 1;
+      return lo + (meters - route[lo].dist) / span;
+    }
+
+    function pluck(p) { return [p.lat, p.lng]; }
+
+    function updateTracking() {
+      var idx = driverIndex(trackToPickup, trackPosition);
+      var d = trackToPickup[Math.floor(idx)];
+      driverMarker.setLatLng([d.lat, d.lng]);
+
+      var remainM = Math.max(0, trackLeg1 - trackPosition);
+      var eta = etaText(Math.ceil(remainM / TRACK_MPS / 60));
+
+      distLabel.textContent = 'Distance to pickup';
+      etaLabel.textContent = 'Estimated arrival at pickup';
+      distEl.textContent = formatTrackDist(remainM);
+      etaEl.textContent = eta;
+
+      /* Trim the live driver -> pickup road line to the driver's spot */
+      proxLine.setLatLngs(trackToPickup.slice(Math.floor(idx)).map(pluck));
+      proxLine.setTooltipContent(
+        formatTrackDist(remainM) + ' · arrives in ' + eta
+      );
+
+      subEl.textContent = driver.name + ' is heading to your pickup point.';
+      proxEl.textContent = driver.name + ' is ' + formatTrackDist(remainM) +
+        ' away · arrives in ' + eta;
+    }
+
+    function arriveAtPickup() {
+      trackArrived = true;
+      clearInterval(trackingTimer);
+      trackingTimer = null;
+
+      /* Park the driver at the pickup point and freeze everything */
+      driverMarker.setLatLng([pickupPt.lat, pickupPt.lng]);
+      if (proxLine) { trackMap.removeLayer(proxLine); proxLine = null; }
+
+      distLabel.textContent = 'Distance to pickup';
+      distEl.textContent = 'Arrived';
+      etaLabel.textContent = 'Estimated arrival';
+      etaEl.textContent = 'Arrived';
+      subEl.textContent = 'Your driver has arrived at your pickup point. 🎉';
+      proxEl.textContent = 'Your driver has arrived. 🎉';
+      badgeEl.textContent = '● At Pickup';
+    }
+
+    trackToPickup = null;
+    trackLeg1 = 0;
+    var trackPosition = 0; // current meters traveled
+    var trackArrived = false;
+
+    fetchOsrmRoute(start, pickupPt).then(function (route) {
+      if (!trackActive) return;
+      trackToPickup = route || straightLeg(start, pickupPt);
+      trackLeg1 = trackToPickup[trackToPickup.length - 1].dist;
+
+      updateTracking();
+
+      trackingTimer = setInterval(function () {
+        if (!trackActive || trackArrived) return;
+        trackPosition += TRACK_MPS;
+
+        if (trackPosition >= trackLeg1) {
+          arriveAtPickup();
+          return;
+        }
+        updateTracking();
+      }, 1000);
+    });
+  }
 
   /* ---------- Cancel the just-booked ride ---------- */
 
@@ -339,6 +611,8 @@
     }
 
     PTB.updateBookingStatus(lastBookingId, 'Cancelled');
+    stopTracking();
+    document.getElementById('trackingArea').classList.add('hidden');
 
     badge.classList.remove('badge-available', 'confirming');
     badge.classList.add('badge-cancelled');

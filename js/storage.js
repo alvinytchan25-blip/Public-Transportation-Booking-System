@@ -14,12 +14,12 @@
 
   /* Preset pool of sim driver identities */
   var DRIVERS = [
-    { name: 'Juan Dela Cruz', phone: '0917 555 1234' },
-    { name: 'Maria Santos', phone: '0918 444 8765' },
-    { name: 'Carlo Reyes', phone: '0920 333 2211' },
-    { name: 'Liza Ramirez', phone: '0921 222 9988' },
-    { name: 'Dante Mendoza', phone: '0932 111 4433' },
-    { name: 'Nina Garcia', phone: '0945 888 7766' }
+    { name: 'Juan', phone: '0917 555 1234' },
+    { name: 'John', phone: '0918 444 8765' },
+    { name: 'Carlo', phone: '0920 333 2211' },
+    { name: 'Mark', phone: '0921 222 9988' },
+    { name: 'Dante', phone: '0932 111 4433' },
+    { name: 'James', phone: '0945 888 7766' }
   ];
 
   function read(key, fallback) {

@@ -103,13 +103,33 @@
     </div>
 
     <div id="resultArea" class="hidden">
-      <div class="success-msg" id="successMsg">🎉 Booking Confirmed! Your driver will arrive in 10 minutes.</div>
       <div class="driver-card">
         <div class="driver-avatar" id="driverInitial">?</div>
         <div class="driver-name" id="driverName">—</div>
         <div class="driver-phone" id="driverPhone">—</div>
         <span class="badge badge-available" id="statusBadge">● Booking Accepted</span>
+        <div class="driver-proximity" id="driverProximity">—</div>
       </div>
+
+      <div class="card tracking-card hidden" id="trackingArea">
+        <div class="tracking-head">
+          <div>
+            <div class="tracking-title">🛣 Live Driver Tracking</div>
+            <div class="tracking-sub" id="trackSub">Connecting to your driver...</div>
+          </div>
+          <span class="badge badge-available" id="trackBadge">● En Route</span>
+        </div>
+        <div id="trackMap" class="map track-map"></div>
+        <div class="tracking-row">
+          <span id="trackDistLabel">Distance to pickup</span>
+          <strong id="trackDist">—</strong>
+        </div>
+        <div class="tracking-row">
+          <span id="trackEtaLabel">Estimated arrival</span>
+          <strong class="eta-value" id="trackEta">—</strong>
+        </div>
+      </div>
+
       <a href="history.html" class="btn btn-primary btn-block mt-16">View Booking History</a>
       <button type="button" id="cancelBookingBtn" class="btn btn-danger btn-block mt-8">Cancel Booking</button>
     </div>
