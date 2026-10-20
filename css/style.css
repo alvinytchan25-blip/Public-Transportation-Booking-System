@@ -1,28 +1,137 @@
 /* this is a testing comment */
 
+/* Transpo — design tokens
+   One brand hue (indigo), one functional accent (amber, for money and timing),
+   a neutral ramp, and one shared hover + motion language. */
+
 :root {
+  /* Brand */
   --primary: #4f46e5;
   --primary-dark: #4338ca;
-  --purple: #6d28d9;
-  --gradient: linear-gradient(135deg, #4f46e5 0%, #6d28d9 100%);
-  --accent: #f97316;
-  --accent-soft: #fff4ed;
-  --bg: #f5f6fa;
-  --surface: #ffffff;
-  --border: #e5e7eb;
-  --text: #111827;
-  --text-muted: #6b7280;
-  --success: #16a34a;
+  --primary-deep: #3730a3;
+  --primary-tint: #eef2ff;
+  --primary-tint-strong: #e0e7ff;
+
+  /* Gradients are where the colour comes from. They live here as tokens so the
+     whole app shifts together instead of every component inventing its own.
+     The brand ramp stays dark enough for white text at every stop. */
+  --grad-brand: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #9333ea 100%);
+  --grad-warm: linear-gradient(135deg, #f59e0b 0%, #f97316 55%, #fb7185 100%);
+  --grad-cool: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  --grad-fresh: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  --grad-danger: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  --gradient: var(--grad-brand);
+
+  /* Accent — dark enough to pass AA as text; the bright tone is for graphics only */
+  --accent: #b45309;
+  --accent-strong: #92400e;
+  --accent-bright: #f97316;
+  --accent-soft: #fff7ed;
+  --accent-border: #fed7aa;
+
+  /* Neutrals */
+  --n-0: #ffffff;
+  --n-50: #f5f6fa;
+  --n-100: #eceef3;
+  --n-200: #e3e6ec;
+  --n-300: #cbd0da;
+  --n-400: #9aa2b1;
+  --n-500: #6b7280;
+  --n-600: #4b5563;
+  --n-700: #374151;
+  --n-800: #1f2937;
+  --n-900: #111827;
+
+  /* Surfaces & text */
+  --bg: #f4f5fb;
+  --surface: var(--n-0);
+  --surface-sunken: var(--n-100);
+  --border: var(--n-200);
+  --border-strong: var(--n-300);
+  --text: var(--n-900);
+  --text-muted: var(--n-600);
+
+  /* Status */
+  --success: #15803d;
   --success-soft: #ecfdf5;
+  --success-border: #a7f3d0;
   --danger: #dc2626;
+  --danger-strong: #b91c1c;
   --danger-soft: #fef2f2;
+  --danger-border: #fecaca;
+  --info: #1d4ed8;
   --info-soft: #eff6ff;
-  --radius: 16px;
+  --info-border: #bfdbfe;
+
+  /* Controls */
+  --btn-bg: var(--n-100);
+  --btn-bg-hover: var(--n-200);
+  --btn-border: var(--n-300);
+  --card-tint: var(--primary-tint);
+
+  /* Radius */
+  --radius-xs: 8px;
   --radius-sm: 10px;
-  --shadow-sm: 0 1px 3px rgba(17, 24, 39, 0.08);
-  --shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
-  --shadow-lg: 0 20px 50px rgba(79, 70, 229, 0.25);
+  --radius: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+
+  /* Elevation — neutral for structure, tinted for anything that acts */
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.06);
+  --shadow: 0 4px 14px rgba(17, 24, 39, 0.08);
+  --shadow-lg: 0 16px 40px rgba(17, 24, 39, 0.14);
+  --glow-brand: 0 10px 22px rgba(79, 70, 229, 0.26);
+  --glow-violet: 0 10px 22px rgba(124, 58, 237, 0.26);
+  --glow-warm: 0 10px 22px rgba(249, 115, 22, 0.24);
+  --glow-fresh: 0 10px 22px rgba(16, 185, 129, 0.22);
+  --glow-soft: 0 14px 34px rgba(79, 70, 229, 0.10);
+
+  /* Motion */
+  --dur-fast: 120ms;
+  --dur: 180ms;
+  --dur-slow: 420ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  /* Focus */
+  --ring: 0 0 0 3px rgba(79, 70, 229, 0.28);
+  --ring-danger: 0 0 0 3px rgba(220, 38, 38, 0.18);
+
+  /* Hover — one shared language: a 2px lift, one shadow step, brand border.
+     Neutralised for touch pointers and reduced-motion users (see below). */
+  --hover-lift: -2px;
+  --hover-shadow: var(--shadow);
+  --hover-border: var(--primary);
+
+  /* Controls lift less than cards so they never look like they float. */
+  --lift-control: -1px;
+
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  :root {
+    --hover-lift: 0px;
+    --hover-shadow: var(--shadow-sm);
+  }
+}
+
+/* ---------- Accessibility ---------- */
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 *,
@@ -45,10 +154,43 @@ body {
   min-height: 100vh;
 }
 
+/* Three soft colour fields drifting behind every page. Fixed so they stay put
+   while the page scrolls, and behind the content so no component has to know
+   they exist. The landing and auth pages paint their own full-bleed colour, so
+   these only show through the app shell. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -12% -8% auto -8%;
+  height: 76vh;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(closest-side, rgba(99, 102, 241, 0.30), transparent 70%),
+    radial-gradient(closest-side, rgba(236, 72, 153, 0.20), transparent 70%),
+    radial-gradient(closest-side, rgba(249, 115, 22, 0.16), transparent 70%);
+  background-size: 64vw 64vw, 52vw 52vw, 46vw 46vw;
+  background-position: 8% 0%, 92% 4%, 58% 54%;
+  background-repeat: no-repeat;
+  filter: blur(8px);
+  animation: aurora-drift 28s var(--ease) infinite alternate;
+}
+
+@keyframes aurora-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(0, 3%, 0) scale(1.08);
+  }
+}
+
 a {
   color: var(--primary);
   text-decoration: none;
   font-weight: 600;
+  transition: color var(--dur-fast) var(--ease);
 }
 
 a:hover {
@@ -71,13 +213,26 @@ input {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border: none;
-  border-radius: 9999px;
+  background: var(--btn-bg);
+  color: var(--text);
+  border: 1px solid var(--btn-border);
+  border-radius: var(--radius-pill);
   padding: 12px 22px;
   font-size: 15px;
   font-weight: 600;
   line-height: 1;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur) var(--ease),
+    background-color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--btn-bg-hover);
+  transform: translateY(var(--lift-control));
+  box-shadow: var(--shadow);
 }
 
 .btn:active {
@@ -85,42 +240,69 @@ input {
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.55;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
-.btn-primary {
-  background: var(--gradient);
-  color: #fff;
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
-}
-
-.btn-primary:hover:not(:disabled) {
-  box-shadow: var(--shadow-lg);
-}
-
+/* Actions carry the brand gradient; secondary and destructive actions stay on
+   light surfaces so one filled button per screen keeps its meaning. Scripts swap
+   these classes to mark state (see services.js, booking.js), so every variant
+   needs its own hover and disabled state. */
+.btn-primary,
 .btn-accent {
-  background: var(--accent);
+  background: var(--grad-brand);
+  background-size: 170% 170%;
+  background-position: 0% 50%;
   color: #fff;
-  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+  border-color: transparent;
+  font-weight: 700;
+  box-shadow: var(--glow-brand);
+  transition: transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    background-position var(--dur-slow) var(--ease);
+}
+
+.btn-primary:hover:not(:disabled),
+.btn-accent:hover:not(:disabled) {
+  background: var(--grad-brand);
+  background-position: 100% 50%;
+  transform: translateY(var(--lift-control));
+  box-shadow: var(--glow-violet);
+}
+
+.btn-primary:disabled,
+.btn-accent:disabled {
+  background: var(--n-200);
+  background-size: auto;
+  color: var(--n-500);
+  border-color: transparent;
+  box-shadow: none;
+  transform: none;
 }
 
 .btn-outline {
   background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+  color: var(--primary);
+  border-color: var(--primary-tint-strong);
 }
 
 .btn-outline:hover:not(:disabled) {
+  background: var(--primary-tint);
+  color: var(--primary-dark);
   border-color: var(--primary);
-  color: var(--primary);
 }
 
 .btn-danger {
-  background: var(--danger);
-  color: #fff;
+  background: var(--surface);
+  color: var(--danger);
+  border-color: var(--danger-border);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--danger-soft);
+  border-color: var(--danger);
 }
 
 .btn-block {
@@ -159,25 +341,33 @@ input {
   font-size: 15px;
   color: var(--text);
   background: var(--surface);
-  border: 1.5px solid var(--border);
+  border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-sm);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+}
+
+.input::placeholder {
+  color: var(--n-500);
+}
+
+.input:hover:not(:disabled):not(.readonly) {
+  border-color: var(--n-400);
 }
 
 .input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  box-shadow: var(--ring);
 }
 
 .input.readonly {
-  background: #f3f4f6;
+  background: var(--n-100);
   color: var(--text-muted);
   cursor: not-allowed;
 }
 
 .input:disabled {
-  background: #f3f4f6;
+  background: var(--n-100);
   color: var(--text-muted);
   cursor: not-allowed;
   opacity: 1;
@@ -185,6 +375,10 @@ input {
 
 .input.invalid {
   border-color: var(--danger);
+}
+
+.input.invalid:focus {
+  box-shadow: var(--ring-danger);
 }
 
 .field-error {
@@ -213,11 +407,18 @@ input {
   top: 50%;
   transform: translateY(-50%);
   background: none;
-  border: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
   color: var(--primary);
   font-size: 12.5px;
   font-weight: 600;
-  padding: 6px 10px;
+  padding: 5px 10px;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.toggle-pw:hover {
+  background: var(--primary-tint);
+  color: var(--primary-dark);
 }
 
 /* ---------- Alerts & badges ---------- */
@@ -228,6 +429,8 @@ input {
   border-radius: var(--radius-sm);
   font-size: 14px;
   margin-bottom: 16px;
+  border: 1px solid transparent;
+  border-left-width: 4px;
 }
 
 .alert.show {
@@ -237,19 +440,19 @@ input {
 .alert-success {
   background: var(--success-soft);
   color: var(--success);
-  border: 1px solid #bbf7d0;
+  border-color: var(--success-border);
 }
 
 .alert-error {
   background: var(--danger-soft);
   color: var(--danger);
-  border: 1px solid #fecaca;
+  border-color: var(--danger-border);
 }
 
 .alert-info {
   background: var(--info-soft);
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
+  color: var(--info);
+  border-color: var(--info-border);
   font-size: 13px;
 }
 
@@ -258,30 +461,45 @@ input {
   align-items: center;
   gap: 6px;
   padding: 4px 12px;
-  border-radius: 9999px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
   font-size: 12.5px;
   font-weight: 700;
 }
 
 .badge-available,
 .badge-active {
-  background: var(--success-soft);
+  background: linear-gradient(135deg, #ecfdf5, #d7f7e6);
   color: var(--success);
+  border-color: var(--success-border);
+  box-shadow: 0 2px 10px rgba(21, 128, 61, 0.14);
 }
 
 .badge-unavailable,
 .badge-offline,
 .badge-cancelled {
-  background: var(--danger-soft);
+  background: linear-gradient(135deg, #fef2f2, #ffe0e0);
   color: var(--danger);
+  border-color: var(--danger-border);
+  box-shadow: 0 2px 10px rgba(220, 38, 38, 0.12);
+}
+
+.badge-completed {
+  background: linear-gradient(135deg, var(--info-soft), #e0e7ff);
+  color: var(--info);
+  border-color: var(--info-border);
+  box-shadow: 0 2px 10px rgba(29, 78, 216, 0.12);
 }
 
 /* ---------- Cards ---------- */
 
+/* Cards keep a white body but wear the brand as a gradient hairline (see each
+   component rule below), so a page of them reads as one set rather than a
+   stack of grey rectangles. */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   padding: 20px;
 }
@@ -290,22 +508,55 @@ input {
 
 .landing {
   min-height: 100vh;
+  position: relative;
+  overflow: hidden;
   background:
-    radial-gradient(1000px 600px at 85% -10%, rgba(109, 40, 217, 0.25), transparent 60%),
-    radial-gradient(800px 500px at -10% 110%, rgba(249, 115, 22, 0.18), transparent 60%),
-    var(--gradient);
+    radial-gradient(1000px 600px at 85% -10%, rgba(168, 85, 247, 0.32), transparent 60%),
+    radial-gradient(800px 500px at -10% 110%, rgba(249, 115, 22, 0.20), transparent 60%),
+    radial-gradient(700px 500px at 100% 110%, rgba(6, 182, 212, 0.20), transparent 60%),
+    linear-gradient(150deg, #eef2ff 0%, #f5f3ff 50%, #fff7ed 100%);
+  background-size: auto, auto, auto, auto;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
 }
 
+/* Slow drift so the first screen the app ever shows is not a still image. */
+.landing::before,
+.landing::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.landing::before {
+  width: 320px;
+  height: 320px;
+  top: -80px;
+  right: -60px;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.28), transparent 70%);
+  animation: aurora-drift 22s var(--ease) infinite alternate;
+}
+
+.landing::after {
+  width: 280px;
+  height: 280px;
+  bottom: -90px;
+  left: -70px;
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.24), transparent 70%);
+  animation: aurora-drift 26s var(--ease) infinite alternate-reverse;
+}
+
 .landing-card {
   width: 100%;
   max-width: 420px;
-  background: var(--surface);
-  border-radius: 24px;
-  box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(180deg, #ffffff, #fdfcff);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 24px 60px rgba(79, 70, 229, 0.18);
   padding: 40px 32px;
   text-align: center;
 }
@@ -313,13 +564,13 @@ input {
 .logo-badge {
   width: 72px;
   height: 72px;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   background: var(--gradient);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 34px;
-  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.4);
+  box-shadow: var(--shadow-lg);
   margin-bottom: 18px;
 }
 
@@ -339,9 +590,9 @@ input {
 .brand-wrap .logo-badge {
   width: 56px;
   height: 56px;
-  border-radius: 16px;
+  border-radius: var(--radius);
   margin-bottom: 0;
-  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.38);
+  box-shadow: var(--shadow);
 }
 
 .brand-wrap .logo-badge img {
@@ -389,29 +640,41 @@ input {
   justify-content: center;
   padding: 24px;
   background:
-    radial-gradient(800px 500px at 110% -10%, rgba(109, 40, 217, 0.12), transparent 55%),
-    radial-gradient(700px 450px at -10% 115%, rgba(249, 115, 22, 0.12), transparent 55%),
+    radial-gradient(800px 500px at 110% -10%, rgba(168, 85, 247, 0.20), transparent 55%),
+    radial-gradient(700px 450px at -10% 115%, rgba(249, 115, 22, 0.16), transparent 55%),
+    radial-gradient(600px 400px at 90% 100%, rgba(6, 182, 212, 0.16), transparent 55%),
     var(--bg);
 }
 
 .auth-card {
   width: 100%;
   max-width: 400px;
-  background: var(--surface);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    linear-gradient(160deg, var(--primary-tint-strong), transparent 45%, #fbcfe8) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 22px 50px rgba(79, 70, 229, 0.14);
   padding: 34px 30px;
 }
 
 .auth-card h1 {
   font-size: 22px;
   margin-bottom: 4px;
+  text-align: center;
 }
 
+/* The form carries the gap from the heading, so pages work with or without
+   the optional .sub line. */
 .auth-card .sub {
   color: var(--text-muted);
   font-size: 14px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.auth-card form {
+  margin-top: 24px;
 }
 
 .auth-switch {
@@ -426,7 +689,7 @@ input {
 }
 
 .auth-switch a:hover {
-  color: #ea580c;
+  color: var(--accent-strong);
 }
 
 /* ---------- App layout ---------- */
@@ -444,7 +707,15 @@ input {
   gap: 10px;
   padding: 10px 2px 18px;
   position: relative;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 0;
+}
+
+/* Fades out at the edges so the header does not end on a hard line. */
+.header-break {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-strong) 35%, var(--border-strong) 65%, transparent);
+  margin: -5px 0 18px;
 }
 
 .topbar .brand-sm {
@@ -456,31 +727,48 @@ input {
   -webkit-text-fill-color: transparent;
 }
 
+.topbar .brand-sm img {
+  width: 50px;
+  height: 50px;
+  vertical-align: middle;
+  margin-right: 9px;
+  border-radius: var(--radius);
+  max-width: 100%;
+}
+
 .nav-links {
   display: flex;
-  gap: 6px;
+  gap: 4px;
 }
 
 .nav-link {
   background: none;
-  border: 1px solid var(--border);
-  border-radius: 9999px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
   padding: 7px 13px;
   font-size: 13px;
   font-weight: 600;
   color: var(--text-muted);
-  transition: all 0.15s ease;
+  transition: background-color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
 }
 
 .nav-link:hover {
-  color: var(--primary);
-  border-color: var(--primary);
+  background: var(--surface-sunken);
+  color: var(--text);
 }
 
 .nav-link.active {
-  background: var(--gradient);
+  background: var(--primary);
   color: #fff;
-  border-color: transparent;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-link.active:hover {
+  background: var(--primary-dark);
+  color: #fff;
 }
 
 /* Hamburger toggle button (hidden on desktop) */
@@ -498,6 +786,12 @@ input {
   align-items: center;
   flex-direction: column;
   gap: 5px;
+  transition: background-color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+
+.nav-toggle:hover {
+  background: var(--surface-sunken);
+  border-color: var(--border-strong);
 }
 
 .nav-toggle span {
@@ -537,10 +831,10 @@ input {
     right: 0;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
     padding: 10px;
-    gap: 8px;
+    gap: 4px;
     z-index: 40;
   }
 
@@ -573,7 +867,7 @@ input {
   font-size: 34px;
   font-weight: 800;
   letter-spacing: 1px;
-  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.35);
+  box-shadow: var(--shadow-lg);
 }
 
 .profile-name {
@@ -591,13 +885,45 @@ input {
 
 /* ---------- Dashboard ---------- */
 
+/* The hero pans slowly across the brand gradient. Content sits above a soft
+   highlight so white text stays legible on every frame. */
 .hero-card {
-  background: var(--gradient);
+  background: var(--grad-brand);
+  background-size: 200% 200%;
   color: #fff;
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   padding: 26px 22px;
   margin-bottom: 20px;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--glow-brand);
+  position: relative;
+  overflow: hidden;
+  animation: gradient-pan 14s ease-in-out infinite alternate;
+}
+
+.hero-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-card::after {
+  content: '';
+  position: absolute;
+  right: -60px;
+  bottom: -90px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.28), transparent 70%);
+}
+
+@keyframes gradient-pan {
+  from {
+    background-position: 0% 50%;
+  }
+
+  to {
+    background-position: 100% 50%;
+  }
 }
 
 .hero-card h2 {
@@ -615,16 +941,27 @@ input {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+  margin-top: 20px;
 }
 
+/* Each dashboard tile takes its own hue, set once here and reused by the icon
+   tile and the hover tint. */
+.menu-card:nth-child(1) { --card-accent: var(--grad-brand); }
+.menu-card:nth-child(2) { --card-accent: var(--grad-warm); }
+.menu-card:nth-child(3) { --card-accent: var(--grad-fresh); }
+.menu-card:nth-child(4) { --card-accent: var(--grad-cool); }
+
 .menu-card {
-  background: var(--surface);
+  background: var(--card-tint);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   padding: 20px 16px;
   text-align: center;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  transition: transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease);
 }
 
 .menu-card.clickable {
@@ -632,15 +969,29 @@ input {
 }
 
 .menu-card.clickable:hover {
-  transform: translateY(-3px);
-  border-color: var(--primary);
-  box-shadow: var(--shadow);
+  transform: translateY(var(--hover-lift));
+  box-shadow: var(--hover-shadow);
+  border-color: var(--hover-border);
+  background: var(--primary-tint-strong);
 }
 
+/* The emoji sits on a coloured tile so each tile has a colour of its own. */
 .menu-card .menu-icon {
-  font-size: 30px;
-  margin-bottom: 10px;
-  display: block;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 10px;
+  border-radius: var(--radius);
+  background: var(--card-accent, var(--grad-brand));
+  box-shadow: var(--glow-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  transition: transform var(--dur) var(--ease);
+}
+
+.menu-card.clickable:hover .menu-icon {
+  transform: scale(1.06) rotate(-4deg);
 }
 
 .menu-card .menu-label {
@@ -676,19 +1027,40 @@ input {
 }
 
 .stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    linear-gradient(135deg, var(--primary-tint-strong), var(--border) 50%, #bae6fd) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   padding: 16px;
   cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    border-color var(--dur-fast) var(--ease);
 }
 
 .stat-card:hover {
-  border-color: var(--primary);
-  transform: translateY(-2px);
+  transform: translateY(var(--hover-lift));
+  box-shadow: var(--hover-shadow);
+  border-color: var(--hover-border);
 }
+
+/* A short colour bar tucked into the top edge of each stat. */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--stat-accent, var(--grad-brand));
+}
+
+.stat-card:nth-child(1) { --stat-accent: var(--grad-brand); }
+.stat-card:nth-child(2) { --stat-accent: var(--grad-warm); }
 
 .stat-card .stat-value {
   font-size: 24px;
@@ -704,14 +1076,18 @@ input {
 /* ---------- Services ---------- */
 
 .service-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    linear-gradient(135deg, var(--primary-tint-strong), var(--border) 40%, #fbcfe8) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   padding: 22px 20px;
   margin-bottom: 16px;
-  transition: border-color 0.15s ease, transform 0.15s ease;
 }
+
+/* No hover on .service-card — it is not clickable, and lifting it would
+   imply otherwise. The Book button inside carries the affordance. */
 
 .service-card.offline {
   opacity: 0.6;
@@ -732,10 +1108,16 @@ input {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--bg);
+  background: linear-gradient(135deg, #ffffff, #f8f7ff);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
+  transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.driver-pool-card:hover {
+  border-color: var(--primary-tint-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .driver-pool-card + .driver-pool-card {
@@ -794,15 +1176,30 @@ input {
   margin-bottom: 14px;
 }
 
+/* Each service keeps its own tint so the two cards on the page are told apart
+   before a word is read (classes come from services.js). */
 .service-icon {
   width: 52px;
   height: 52px;
-  border-radius: 14px;
-  background: var(--info-soft);
+  border-radius: var(--radius);
+  background: var(--icon-tint, var(--primary-tint));
+  border: 1px solid var(--icon-ring, var(--primary-tint-strong));
+  box-shadow: var(--glow-soft);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 26px;
+  flex-shrink: 0;
+}
+
+.service-icon.motorcycle {
+  --icon-tint: #eef6ff;
+  --icon-ring: #bfdbfe;
+}
+
+.service-icon.taxi {
+  --icon-tint: #fff7ed;
+  --icon-ring: #fed7aa;
 }
 
 .service-head .s-name {
@@ -824,7 +1221,8 @@ input {
 }
 
 .price-chip {
-  background: var(--bg);
+  background: linear-gradient(135deg, #fffaf3, #fff4e6);
+  border: 1px solid #fde3bd;
   border-radius: var(--radius-sm);
   padding: 10px 12px;
 }
@@ -852,38 +1250,147 @@ input {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--gradient);
+  background: var(--grad-brand);
+  background-size: 200% 200%;
   color: #fff;
-  border-radius: var(--radius);
-  padding: 16px 18px;
-  margin-bottom: 18px;
-  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  box-shadow: var(--glow-brand);
+  position: relative;
+  overflow: hidden;
+  animation: gradient-pan 14s ease-in-out infinite alternate;
 }
 
+.service-banner > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Icon sits on its own tile so it reads against the gradient. */
 .service-banner .sb-icon {
-  font-size: 28px;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
 }
 
 .service-banner .sb-name {
   font-weight: 800;
-  font-size: 17px;
+  font-size: 16px;
 }
 
-.service-banner .sb-sub {
-  opacity: 0.9;
-  font-size: 13px;
+/* ---------- Booking form ---------- */
+
+.booking-form .form-head {
+  font-size: 15px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+/* Pickup and destination read as one address book: a dot, a fixed label, then
+   the editable field. The two points are a single route, so they share a box
+   and a connector instead of being two separate form groups. */
+.route-box {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2px 14px;
+  margin-bottom: 14px;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+/* Editing either end lights the whole route, since they are one trip. */
+.route-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: var(--ring);
+}
+
+.route-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  cursor: text;
+}
+
+.route-row .leg-dot {
+  flex-shrink: 0;
+}
+
+.route-row .rr-field {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.route-row .rr-label {
+  flex-shrink: 0;
+  width: 92px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+}
+
+/* The field lives inside the route row, so it needs no box of its own — the row
+   is the border, and focus is shown by the caret plus the row's own tint. */
+.input.input-flush {
+  min-width: 0;
+  padding: 2px 0;
+  font-size: 15px;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.input.input-flush:hover:not(:disabled):not(.readonly) {
+  border: none;
+}
+
+.input.input-flush:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.input.input-flush.readonly,
+.input.input-flush:disabled {
+  color: var(--text-muted);
+  -webkit-text-fill-color: var(--text-muted);
+}
+
+/* The line between the two dots, so the pair reads as one route. */
+.route-connector {
+  display: block;
+  width: 2px;
+  height: 14px;
+  margin-left: 4.5px;
+  background: var(--border-strong);
+  border-radius: 2px;
 }
 
 .map-block {
   position: relative;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .map {
   position: relative;
-  height: 360px;
+  height: 340px;
   border-radius: var(--radius);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   overflow: hidden;
   z-index: 1;
 }
@@ -894,30 +1401,12 @@ input {
   font-family: var(--font);
 }
 
-.map-label {
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid var(--border);
-  border-radius: 9999px;
-  padding: 5px 14px;
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-muted);
-  box-shadow: var(--shadow-sm);
-  z-index: 1100;
-  pointer-events: none;
-  white-space: nowrap;
-}
-
 .leaflet-div-icon {
   background: transparent;
   border: none;
 }
 
-/* Custom map pins */
+/* Custom map pins — the bright accent is a graphic, so it needs no contrast */
 .pin {
   position: relative;
   width: 32px;
@@ -927,7 +1416,7 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.35);
+  box-shadow: var(--shadow);
 }
 
 .pin span {
@@ -942,15 +1431,25 @@ input {
 }
 
 .pin-dest {
-  background: var(--accent);
+  background: var(--accent-bright);
+}
+
+/* Below the map: what the two pin colours mean on the left, the measured
+   distance on the right. One line, so the eye settles before the fare. */
+.map-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 8px;
 }
 
 .map-legend {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   font-size: 12px;
   color: var(--text-muted);
-  margin-bottom: 14px;
 }
 
 .map-legend .leg {
@@ -971,41 +1470,45 @@ input {
 }
 
 .leg-dot.dropoff {
-  background: var(--accent);
+  background: var(--accent-bright);
 }
 
-.route-readout {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  padding: 14px 16px;
-  margin-bottom: 16px;
-  font-size: 14px;
-}
-
-.route-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.route-row .rr-icon {
-  font-size: 16px;
-}
-
-.route-row .rr-text {
+.map-dist {
+  font-size: 12.5px;
   color: var(--text-muted);
 }
 
-.route-row .rr-text strong {
+.map-dist strong {
+  font-size: 13.5px;
   color: var(--text);
 }
 
-.route-row + .route-row {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px dashed var(--border);
+/* The page writes one line of guidance here as the rider advances. */
+.map-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.map-hint:empty {
+  margin-bottom: 0;
+}
+
+/* A labelled row: name on the left, its control on the right. */
+.trip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.trip-row .trip-label {
+  font-size: 14px;
+  font-weight: 700;
 }
 
 /* Stepper */
@@ -1013,24 +1516,32 @@ input {
 .stepper {
   display: inline-flex;
   align-items: center;
-  gap: 16px;
-  background: var(--bg);
-  border: 1.5px solid var(--border);
-  border-radius: 9999px;
-  padding: 6px;
+  gap: 14px;
+  background: var(--n-50);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 4px;
 }
 
 .stepper button {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: none;
-  background: var(--gradient);
-  color: #fff;
+  border: 1px solid var(--btn-border);
+  background: var(--surface);
+  color: var(--text);
   font-size: 18px;
   font-weight: 700;
   line-height: 1;
-  transition: transform 0.12s ease;
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.stepper button:hover:not(:disabled) {
+  background: var(--surface-sunken);
+  border-color: var(--n-400);
 }
 
 .stepper button:active {
@@ -1038,8 +1549,10 @@ input {
 }
 
 .stepper button:disabled {
-  background: #d1d5db;
+  background: var(--n-100);
+  color: var(--n-400);
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .stepper .count {
@@ -1049,21 +1562,21 @@ input {
   text-align: center;
 }
 
-/* Fare board */
-
+/* Fare board — inset inside the form card, so it reads as the running total of
+   the fields above rather than a separate panel. */
 .fare-board {
-  background: var(--surface);
+  background: var(--n-50);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  padding: 18px;
-  margin-top: 16px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
 }
 
 .fare-row {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  gap: 12px;
+  font-size: 13.5px;
   color: var(--text-muted);
   padding: 5px 0;
 }
@@ -1073,13 +1586,21 @@ input {
   font-weight: 600;
 }
 
+/* The total is the one number the rider came for — give it its own tinted
+   block instead of a dashed rule. */
+/* Warm, because this is the money. Kept as a light tint with dark amber text
+   rather than a filled gradient, so the figure stays readable. */
 .fare-total {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1.5px dashed var(--border);
-  margin-top: 10px;
-  padding-top: 12px;
+  gap: 10px;
+  background: linear-gradient(135deg, #fffaf3, #ffedd5);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--glow-warm);
+  margin-top: 12px;
+  padding: 10px 12px;
   font-size: 15px;
   font-weight: 700;
 }
@@ -1090,12 +1611,35 @@ input {
   color: var(--accent);
 }
 
+/* The honest limit of the estimate, kept with the numbers it applies to. */
+.fare-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Reset stays secondary, Confirm Booking carries the row. */
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.form-actions .btn-outline {
+  flex: 1;
+}
+
+.form-actions .btn-accent {
+  flex: 2;
+}
+
 /* Driver card */
 
 .driver-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    linear-gradient(135deg, #fbcfe8, var(--border) 40%, var(--primary-tint-strong)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   padding: 20px;
   margin-top: 18px;
@@ -1131,14 +1675,15 @@ input {
   margin-top: 4px;
   font-size: 13.5px;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-dark);
 }
 
 .success-msg {
-  background: var(--success-soft);
+  background: linear-gradient(135deg, #ecfdf5, #d9fbe9);
   color: var(--success);
-  border: 1px solid #bbf7d0;
-  border-radius: var(--radius);
+  border: 1px solid var(--success-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glow-fresh);
   padding: 16px;
   font-weight: 700;
   font-size: 15px;
@@ -1149,10 +1694,131 @@ input {
 .success-msg.cancelled {
   background: var(--danger-soft);
   color: var(--danger);
-  border-color: #fecaca;
+  border-color: var(--danger-border);
+}
+
+/* ---------- Confirmed trip ---------- */
+
+/* Stands in for the form once it is hidden, so the route and the money are
+   still readable without the map, inputs, stepper and fare board. */
+.trip-summary {
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    linear-gradient(135deg, #fbcfe8, var(--border) 40%, var(--primary-tint-strong)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 16px 18px;
+  margin-top: 18px;
+  text-align: left;
+}
+
+.trip-summary .trip-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 7px;
+}
+
+.trip-summary .trip-value {
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.trip-summary .trip-arrow {
+  color: var(--text-muted);
+  font-weight: 400;
+  margin: 0 5px;
+}
+
+.trip-summary .trip-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--border);
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+.trip-summary .trip-meta strong {
+  color: var(--text);
+}
+
+.trip-summary .trip-sep {
+  color: var(--border);
+}
+
+.track-driver-btn {
+  margin-top: 16px;
+}
+
+/* History + Cancel travel together as one block so they can be revealed or
+   dismissed as a pair. */
+.ride-actions {
+  margin-top: 16px;
+}
+
+.ride-actions .btn + .btn {
+  margin-top: 10px;
 }
 
 /* ---------- Live driver tracking ---------- */
+
+/* The marker that moves: the vehicle sits on the road, its name on a tag below,
+   so the rider can tell both what is moving and who is driving it. The tag is
+   taken out of flow so a long name never shifts the marker off its point, and
+   the whole thing ignores pointer events so the map stays draggable. */
+.driver-marker {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+}
+
+.driver-marker .driver-tag {
+  position: absolute;
+  top: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 3px 9px;
+  background: var(--surface);
+  border: 1px solid var(--primary-tint-strong);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+  max-width: 132px;
+}
+
+.driver-marker .driver-tag-name {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--primary-dark);
+  line-height: 1.2;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.driver-marker .driver-tag-service {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
 
 .tracking-card {
   margin-top: 18px;
@@ -1209,18 +1875,34 @@ input {
   font-weight: 800;
 }
 
+/* The vehicle drawing inside the beacon. Sized by its own box, not the font, so
+   every browser draws the same shape. --bubble-cut is the colour the drawing
+   punches back out to, which keeps the wheels and windows reading as holes. */
 .driver-bubble {
+  --bubble-cut: #f97316;
   position: relative;
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--accent-bright);
   border: 3px solid #fff;
-  box-shadow: 0 4px 14px rgba(17, 24, 39, 0.35);
+  box-shadow: var(--shadow);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+}
+
+.driver-bubble svg {
+  width: 25px;
+  height: 17px;
+  display: block;
+}
+
+/* A taxi reads better in the brand indigo, so the beacon colour carries the
+   vehicle type along with the drawing. */
+.driver-bubble.is-taxi {
+  --bubble-cut: #4f46e5;
+  background: var(--primary);
 }
 
 .driver-bubble::after {
@@ -1229,17 +1911,17 @@ input {
   inset: -7px;
   border-radius: 50%;
   border: 2px solid rgba(249, 115, 22, 0.55);
-  animation: driver-pulse 1.6s ease-out infinite;
+  animation: driver-pulse 1.6s var(--ease) infinite;
 }
 
 .proximity-tip {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 9999px;
+  border-radius: var(--radius-pill);
   padding: 3px 11px;
   font-size: 12px;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-dark);
   box-shadow: var(--shadow-sm);
   white-space: nowrap;
 }
@@ -1260,7 +1942,7 @@ input {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(17, 24, 39, 0.72);
+  background: rgba(17, 24, 39, 0.68);
   backdrop-filter: blur(3px);
   display: none;
   align-items: center;
@@ -1274,7 +1956,7 @@ input {
 
 .overlay-box {
   background: var(--surface);
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   padding: 34px 38px;
   text-align: center;
   box-shadow: var(--shadow-lg);
@@ -1286,7 +1968,7 @@ input {
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  border: 4px solid var(--border);
+  border: 4px solid var(--n-200);
   border-top-color: var(--primary);
   animation: spin 0.9s linear infinite;
   margin: 0 auto 16px;
@@ -1328,10 +2010,75 @@ input {
 
 /* ---------- History ---------- */
 
-.booking-item {
+/* Status filter tabs — the page names the view it is showing, so arriving
+   from a dashboard stat card never looks like the unfiltered history. */
+.filter-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filter-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-pill);
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: background-color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.tab:hover {
+  background: var(--primary-tint);
+  color: var(--primary-dark);
+  border-color: var(--primary-tint-strong);
+}
+
+.tab.active {
+  background: var(--grad-brand);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: var(--glow-brand);
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--n-100);
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.tab.active .tab-count {
+  background: rgba(255, 255, 255, 0.24);
+  color: #fff;
+}
+
+.booking-item {
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    linear-gradient(135deg, var(--primary-tint-strong), var(--border) 45%, #fbcfe8) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   padding: 18px 18px 14px;
   margin-bottom: 14px;
@@ -1357,8 +2104,8 @@ input {
   font-size: 20px;
   width: 38px;
   height: 38px;
-  border-radius: 10px;
-  background: var(--info-soft);
+  border-radius: var(--radius-xs);
+  background: var(--primary-tint);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1367,7 +2114,8 @@ input {
 .booking-route {
   font-size: 14px;
   color: var(--text);
-  background: var(--bg);
+  background: var(--n-50);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
   margin-bottom: 10px;
@@ -1390,43 +2138,108 @@ input {
   margin: 0 6px;
 }
 
+/* Trip facts sit as even tiles: small label above the value, so no line reads
+   as a half sentence and the fare is the one thing that stands out. */
 .booking-meta {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
   gap: 8px;
-  font-size: 13.5px;
-  color: var(--text-muted);
   margin-bottom: 12px;
 }
 
+.booking-meta .bm-item {
+  background: var(--n-50);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
+.booking-meta .bm-label {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
 .booking-meta strong {
+  display: block;
+  font-size: 14px;
   color: var(--text);
 }
 
 .booking-meta .bm-fare {
-  font-size: 17px;
-  font-weight: 800;
-  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+}
+
+.booking-meta .bm-fare .bm-label {
+  color: var(--accent-strong);
 }
 
 .booking-meta .bm-fare strong {
   color: var(--accent);
+  font-size: 17px;
+  font-weight: 800;
 }
 
+/* Fades out at both ends instead of stopping dead. */
 .divider {
   border: none;
-  border-top: 1px dashed var(--border);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
   margin: 10px 0;
 }
 
+/* The driver, in one bordered row: avatar, then the name with its contact
+   directly under it, so who drove and how to reach them stay together. */
 .booking-driver {
-  font-size: 13.5px;
-  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #f8f7ff, var(--primary-tint));
+  border: 1px solid var(--primary-tint-strong);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
   margin-bottom: 12px;
 }
 
-.booking-driver strong {
+.booking-driver .bd-avatar {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--grad-brand);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.booking-driver .bd-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.booking-driver .bd-name {
+  font-size: 14px;
+  font-weight: 700;
   color: var(--text);
+}
+
+.booking-driver .bd-phone {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* Rate (or the saved stars) rides at the right of the driver row. */
+.booking-actions.bd-action {
+  margin-left: auto;
 }
 
 .booking-footer {
@@ -1441,25 +2254,223 @@ input {
   color: var(--text-muted);
 }
 
-.cancel-btn {
+/* A request waiting on the driver, said once under the badge rather than left
+   to the rider to work out from the status alone. */
+.booking-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--info);
+  background: var(--info-soft);
+  border: 1px solid var(--info-border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  margin-bottom: 10px;
+}
+
+/* The deadline on a cancelled booking, so "deleted after 24 hours" is a time,
+   not a vague warning. */
+.retention-note {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--danger-strong);
+}
+
+/* Says how long a cancelled booking is kept on the Cancelled view. */
+.retention-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--danger-strong);
   background: var(--danger-soft);
-  color: var(--danger);
-  border: 1px solid #fecaca;
-  border-radius: 9999px;
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+/* Reveals the rest of a long list, one page at a time. */
+.show-more {
+  display: block;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 11px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary-deep);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur) var(--ease),
+    background-color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+}
+
+.show-more:hover {
+  background: var(--primary-tint);
+  border-color: var(--primary-tint-strong);
+  transform: translateY(var(--lift-control));
+}
+
+.cancel-btn {
+  background: var(--btn-bg);
+  color: var(--danger-strong);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-pill);
   padding: 8px 18px;
   font-size: 13px;
   font-weight: 700;
-  transition: background-color 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur) var(--ease),
+    background-color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    box-shadow var(--dur) var(--ease);
 }
 
-.cancel-btn:hover {
-  background: var(--danger);
-  color: #fff;
+.cancel-btn:hover:not(:disabled) {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+  transform: translateY(var(--lift-control));
+  box-shadow: var(--shadow);
 }
 
+/* Two taps to confirm, so it only goes full colour on the second one. */
 .cancel-btn.confirming {
-  background: var(--danger);
+  background: var(--grad-danger);
   color: #fff;
+  border-color: transparent;
+  box-shadow: 0 10px 22px rgba(225, 29, 72, 0.28);
+}
+
+/* Driver is at the pickup point, so this is a state label now, not an action:
+   drop the danger treatment entirely and let it read as settled. */
+.cancel-btn:disabled {
+  background: var(--n-100);
+  color: var(--text-muted);
+  border-color: var(--border);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* ---------- Active booking actions + inline tracking ---------- */
+
+/* Track and Cancel sit together so the eye finds them in one place. */
+.booking-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Rate joins them on the finished rides, and matches their scale without
+   repeating their whole rule. */
+.booking-actions .btn {
+  padding: 8px 18px;
+  font-size: 13px;
+}
+
+.track-btn {
+  background: var(--grad-brand);
+  background-size: 170% 170%;
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: var(--glow-brand);
+  transition: background-position var(--dur-slow) var(--ease),
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.track-btn:hover {
+  background: var(--grad-brand);
+  background-position: 100% 50%;
+  transform: translateY(var(--lift-control));
+  box-shadow: var(--glow-violet);
+}
+
+/* While the map is open the button becomes a way back out, so it steps down
+   from a solid call to action to a quieter outline. */
+.track-btn.tracking-open {
+  background: var(--primary-tint);
+  color: var(--primary-deep);
+  border-color: var(--primary-tint-strong);
+}
+
+.track-btn.tracking-open:hover {
+  background: var(--primary-tint-strong);
+}
+
+/* Where the live tracking expands. Kept outside the card's flow when closed.
+   The rating slot opens the same way, so it shares the rule. */
+.inline-track-slot,
+.inline-rate-slot {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+
+.inline-track {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+}
+
+.inline-track-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.inline-track-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.inline-track-map {
+  height: 220px;
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+}
+
+.inline-track-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 3px 0;
+}
+
+.inline-track-row strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.inline-track-row .eta-value {
+  color: var(--primary-deep);
+}
+
+.inline-track-note {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
 /* ---------- About ---------- */
@@ -1467,7 +2478,7 @@ input {
 .about-hero-icon {
   width: 52px;
   height: 52px;
-  border-radius: 14px;
+  border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.2);
   display: inline-flex;
   align-items: center;
@@ -1504,11 +2515,19 @@ input {
   margin-top: 8px;
 }
 
+/* Feature tiles rotate through the accent gradients so the page has a colour
+   rhythm instead of one repeated swatch. */
+.about-feature:nth-of-type(1) .af-icon { --af-accent: var(--grad-brand); }
+.about-feature:nth-of-type(2) .af-icon { --af-accent: var(--grad-cool); }
+.about-feature:nth-of-type(3) .af-icon { --af-accent: var(--grad-warm); }
+.about-feature:nth-of-type(4) .af-icon { --af-accent: var(--grad-fresh); }
+
 .about-feature .af-icon {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
-  background: var(--info-soft);
+  border-radius: var(--radius-xs);
+  background: var(--af-accent, var(--grad-brand));
+  box-shadow: var(--glow-soft);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1551,16 +2570,19 @@ input {
 
 /* ---------- Footer ---------- */
 
+/* Kept on the neutral near-black it always had, so the footer stays the quiet
+   end of the page rather than competing with the coloured content above it. */
 .site-footer {
-  background: #111827;
-  color: #cbd5e1;
+  background: var(--n-900);
+  color: var(--n-300);
   border-top: 3px solid var(--primary);
   margin-top: 48px;
 }
 
 .site-footer a {
-  color: #cbd5e1;
+  color: var(--n-300);
   font-weight: 600;
+  transition: color var(--dur-fast) var(--ease);
 }
 
 .site-footer a:hover {
@@ -1594,7 +2616,7 @@ input {
 
 .footer-brand p {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--n-400);
   margin-top: 4px;
   max-width: 210px;
 }
@@ -1626,7 +2648,7 @@ input {
 .fc-icon {
   width: 28px;
   height: 28px;
-  border-radius: 8px;
+  border-radius: var(--radius-xs);
   background: rgba(255, 255, 255, 0.1);
   display: inline-flex;
   align-items: center;
@@ -1639,23 +2661,38 @@ input {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   padding-top: 14px;
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--n-400);
   text-align: center;
 }
 
 /* ---------- Empty state ---------- */
 
+/* Nothing to show still gets colour: a soft panel instead of a dashed outline. */
 .empty-state {
   text-align: center;
   padding: 48px 20px;
-  background: var(--surface);
-  border: 1px dashed var(--border);
-  border-radius: var(--radius);
+  background: linear-gradient(160deg, #ffffff, var(--primary-tint));
+  border: 1px solid var(--primary-tint-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .empty-state .em-icon {
   font-size: 44px;
   margin-bottom: 12px;
+  display: inline-block;
+  animation: float 3.4s ease-in-out infinite alternate;
+}
+
+/* Slow, small, and disabled by the reduced-motion rule already in place. */
+@keyframes float {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-5px);
+  }
 }
 
 .empty-state h3 {
@@ -1667,6 +2704,111 @@ input {
   color: var(--text-muted);
   font-size: 13.5px;
   margin-bottom: 18px;
+}
+
+/* ---------- Star rating ---------- */
+
+/* Two rows of stars stacked: the pale one is the whole scale, the coloured one
+   is clipped to the value. Filling by width rather than by counting whole stars
+   is what lets an average of 4.6 read as 4.6 instead of five. */
+.stars-track {
+  position: relative;
+  display: inline-block;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: var(--n-300);
+  white-space: nowrap;
+}
+
+.stars-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--accent-bright);
+}
+
+.stars-caption {
+  margin-left: 7px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* Nobody has rated this driver yet. */
+.stars-static {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* The picker: five real buttons, so each star is its own tap target. Warm
+   tint, because this is the one rewarding moment on the card. */
+.rate-picker {
+  background: linear-gradient(135deg, #fffdf8, #fff4e6);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+}
+
+.rate-question {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.star {
+  background: none;
+  border: 0;
+  padding: 2px;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--n-300);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.star.on {
+  color: var(--accent-bright);
+}
+
+.star:hover {
+  transform: translateY(-1px);
+}
+
+.star:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* The stars a rider already gave, sitting where the Rate button was. */
+.rate-saved {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Driver pool: the rating sits above Book Now on the right of the card, so a
+   driver's standing is read before committing to the booking. */
+.dp-rate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.dp-rating {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 /* ---------- Utility ---------- */
@@ -1686,6 +2828,199 @@ input {
   }
 
   .service-prices {
+    grid-template-columns: 1fr;
+  }
+
+  /* Narrow screens: the fixed label would squeeze the place name, so it stacks
+     above the field instead. */
+  .route-row .rr-field {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .route-row .rr-label {
+    width: auto;
+  }
+
+  .map {
+    height: 260px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+}
+
+/* ---------- Scheduled booking (Book a Ride) ---------- */
+
+.badge-pending {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  color: #b45309;
+  border-color: #fcd34d;
+  box-shadow: 0 2px 10px rgba(180, 83, 9, 0.14);
+}
+
+.booking-form .field {
+  margin-bottom: 16px;
+}
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.schedule-grid .field {
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.vehicle-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.vehicle-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: border-color var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+}
+
+.vehicle-option:hover {
+  border-color: var(--n-400);
+}
+
+.vehicle-option.selected {
+  border-color: var(--primary);
+  background: var(--primary-tint);
+  box-shadow: var(--ring);
+}
+
+.vehicle-option.selected::after {
+  content: '✓';
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.vehicle-option .vo-icon {
+  font-size: 24px;
+}
+
+.vehicle-option .vo-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.step-two {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.driver-select {
+  margin-bottom: 16px;
+}
+
+.driver-select-hint {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+}
+
+.driver-choice {
+  cursor: pointer;
+}
+
+.driver-choice.selected {
+  border-color: var(--primary);
+  box-shadow: var(--ring);
+  background: linear-gradient(135deg, #ffffff, var(--primary-tint));
+}
+
+.driver-choice .dp-type {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.driver-check {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--primary-tint);
+  border: 1.5px solid var(--primary-tint-strong);
+  border-radius: var(--radius-pill);
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+.driver-choice.selected .driver-check {
+  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.schedule-estimate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  margin: 0 0 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--n-100);
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+.schedule-estimate strong {
+  font-size: 18px;
+  color: var(--text);
+}
+
+.map-hint.error {
+  color: var(--danger);
+}
+
+.scheduled-confirm {
+  text-align: center;
+}
+
+.scheduled-confirm .sc-icon {
+  font-size: 40px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.scheduled-confirm .sc-title {
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.scheduled-confirm .sc-text {
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+@media (max-width: 420px) {
+  .schedule-grid,
+  .vehicle-toggle {
     grid-template-columns: 1fr;
   }
 }

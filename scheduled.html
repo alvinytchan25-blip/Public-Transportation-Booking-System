@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book a Ride — Transpo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="js/storage.js"></script>
+  <script src="js/nav.js"></script>
+
+  <script>
+    (function () {
+      if (!PTB.getCurrentUser()) {
+        location.replace('login.html');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="app">
+    <div id="site-header"></div>
+
+    <h1 class="page-title">Book a ride</h1>
+    <p class="page-sub" id="pageSub">Schedule a ride for a future date and time.</p>
+
+    <div class="card booking-form" id="scheduledForm">
+      <div class="form-head">Trip details</div>
+
+      <div class="route-box">
+        <label class="route-row" for="pickupName">
+          <span class="leg-dot pickup"></span>
+          <span class="rr-field">
+            <span class="rr-label">Pickup</span>
+            <input class="input input-flush" type="text" id="pickupName" placeholder="Tap the map to set pickup" autocomplete="off">
+          </span>
+        </label>
+
+        <span class="route-connector" aria-hidden="true"></span>
+
+        <label class="route-row" for="destName">
+          <span class="leg-dot dropoff"></span>
+          <span class="rr-field">
+            <span class="rr-label">Destination</span>
+            <input class="input input-flush" type="text" id="destName" placeholder="Tap the map to set destination" autocomplete="off">
+          </span>
+        </label>
+      </div>
+
+      <div class="map-block">
+        <div id="rideMap" class="map"></div>
+      </div>
+
+      <div class="map-foot">
+        <div class="map-legend">
+          <span class="leg"><span class="leg-dot pickup"></span>Pickup</span>
+          <span class="leg"><span class="leg-dot dropoff"></span>Destination</span>
+        </div>
+        <span class="map-dist">Distance <strong id="distOut">—</strong></span>
+      </div>
+
+      <p id="mapHint" class="map-hint">Tap the map to set your pickup.</p>
+
+      <div class="schedule-grid">
+        <div class="field">
+          <label class="label" for="schedDate">Scheduled date</label>
+          <input class="input" type="date" id="schedDate">
+          <span class="field-error" id="dateError">Choose a date from today onward.</span>
+        </div>
+        <div class="field">
+          <label class="label" for="schedTime">Scheduled time</label>
+          <input class="input" type="time" id="schedTime">
+          <span class="field-error" id="timeError">Choose a time later than now.</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="label">Vehicle type</span>
+        <div class="vehicle-toggle" id="vehicleToggle" role="group" aria-label="Vehicle type">
+          <button type="button" class="vehicle-option" data-type="motorcycle">
+            <span class="vo-icon">🏍</span><span class="vo-name">Motorcycle</span>
+          </button>
+          <button type="button" class="vehicle-option" data-type="taxi">
+            <span class="vo-icon">🚕</span><span class="vo-name">Taxi</span>
+          </button>
+        </div>
+        <span class="field-error" id="vehicleError">Select a vehicle type.</span>
+      </div>
+
+      <div class="form-head step-two">Select a driver</div>
+      <div id="driverList" class="driver-select"></div>
+      <span class="field-error" id="driverError">Select an available driver.</span>
+
+      <div class="schedule-estimate hidden" id="estimate">
+        <span>Estimated total</span>
+        <strong id="estFare">—</strong>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" id="resetBtn" class="btn btn-outline">Reset</button>
+        <button type="button" id="submitBtn" class="btn btn-accent btn-lg">
+          Submit Booking Request
+        </button>
+      </div>
+    </div>
+
+    <div id="resultArea" class="hidden">
+      <div class="card scheduled-confirm">
+        <div class="sc-icon">✅</div>
+        <h2 class="sc-title">Request sent</h2>
+        <p class="sc-text">Your booking request has been sent. Please wait for the driver's acceptance.</p>
+
+        <div class="trip-summary" id="tripSummary">
+          <span class="trip-label">Your scheduled ride</span>
+          <div class="trip-value">
+            <span id="tsPickup">—</span>
+            <span class="trip-arrow">→</span>
+            <span id="tsDest">—</span>
+          </div>
+          <div class="trip-meta">
+            <span id="tsWhen">—</span>
+            <span class="trip-sep" aria-hidden="true">·</span>
+            <span>Total <strong id="tsFare">—</strong></span>
+          </div>
+        </div>
+
+        <div class="driver-card">
+          <div class="driver-avatar" id="driverInitial">?</div>
+          <div class="driver-name" id="driverName">—</div>
+          <div class="driver-phone" id="driverPhone">—</div>
+          <span class="badge badge-pending" id="statusBadge">● Pending Acceptance</span>
+        </div>
+
+        <a href="history.html?status=Active" class="btn btn-primary btn-block">View Active Bookings</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="site-footer"></div>
+  <script src="js/header.js"></script>
+  <script src="js/footer.js"></script>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/track.js"></script>
+  <script src="js/scheduled.js"></script>
+</body>
+</html>

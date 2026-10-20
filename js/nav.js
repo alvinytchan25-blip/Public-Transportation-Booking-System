@@ -3,12 +3,31 @@
 (function () {
   'use strict';
 
+  var ready = false;
+
+  function markActive(nav) {
+    if (!nav) return;
+
+    var links = nav.querySelectorAll('a');
+    var current = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+
+    for (var i = 0; i < links.length; i++) {
+      var href = (links[i].getAttribute('href') || '').toLowerCase();
+      links[i].classList.toggle('active', href === current);
+    }
+  }
+
   function init() {
     var topbar = document.querySelector('.topbar');
-    if (!topbar) return;
+    if (!topbar || ready) return;
 
     var nav = topbar.querySelector('.nav-links');
     if (!nav) return;
+
+    ready = true;
+    markActive(nav);
+
+    if (topbar.querySelector('.nav-toggle')) return;
 
     var btn = document.createElement('button');
     btn.className = 'nav-toggle';
@@ -44,9 +63,19 @@
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
+  function start() {
     init();
+    /* header.html is injected asynchronously - re-check until it lands. */
+    var tries = 0;
+    var timer = setInterval(function () {
+      init();
+      if (ready || ++tries > 40) clearInterval(timer);
+    }, 50);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
   }
 })();

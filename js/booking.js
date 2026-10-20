@@ -20,19 +20,17 @@
   var pickup = null, dest = null;
   var pickupMarker = null, destMarker = null;
   var passengers = 1, distance = null;
-  var state = { booked: false };
+  var state = { booked: false, cancelled: false };
   var lastBookingId = null;
+  var lastDriverName = null;
 
   /* ---------- DOM refs ---------- */
   var pickupInput = document.getElementById('pickupName');
   var destInput = document.getElementById('destName');
-  var pickupOut = document.getElementById('pickupOut');
-  var destOut = document.getElementById('destOut');
   var distOut = document.getElementById('distOut');
   var paxCount = document.getElementById('paxCount');
   var fareBoard = document.getElementById('fareBoard');
   var fPerKm = document.getElementById('fPerKm');
-  var fDistance = document.getElementById('fDistance');
   var fPerPax = document.getElementById('fPerPax');
   var fPax = document.getElementById('fPax');
   var fTotal = document.getElementById('fTotal');
@@ -41,16 +39,21 @@
   var clearBtn = document.getElementById('clearBtn');
   var overlay = document.getElementById('loadingOverlay');
 
+  /* Post-confirmation blocks */
+  var bookingForm = document.getElementById('bookingForm');
+  var resultArea = document.getElementById('resultArea');
+  var trackDriverBtn = document.getElementById('trackDriverBtn');
+  var rideActions = document.getElementById('rideActions');
+  var pageSub = document.querySelector('.page-sub');
+
   /* ---------- Static UI ---------- */
 
   var banner = document.getElementById('serviceBanner');
   banner.innerHTML =
     '<span class="sb-icon">' + service.icon + '</span>' +
-    '<div><div class="sb-name">' + service.name + '</div>' +
-    '<div class="sb-sub">' + PTB.formatMoney(service.pricePerKm) + '/km - ' +
-    PTB.formatMoney(service.pricePerPassenger) + '/passenger</div></div>';
+    '<div class="sb-name">' + service.name + '</div>';
 
-  mapHint.textContent = 'Tap the map to set your pickup point.';
+  mapHint.textContent = 'Tap the map to set your pickup.';
 
   /* ============ Real map (Leaflet + OpenStreetMap) ============ */
 
@@ -140,7 +143,6 @@
         point.name = name;
         var input = point === pickup ? pickupInput : destInput;
         input.value = name;
-        syncRouteReadout();
       })
       .catch(function () { /* offline or rate-limited: keep coordinates */ });
   }
@@ -150,7 +152,6 @@
     var input = kind === 'pickup' ? pickupInput : destInput;
     input.value = coordsLabel(point);
     reverseGeocode(point);
-    syncRouteReadout();
     updateFare();
   }
 
@@ -160,7 +161,7 @@
     if (state.booked) return;
     if (!pickup) {
       placePickup(e.latlng);
-      mapHint.textContent = 'Now tap your destination on the map.';
+      mapHint.textContent = 'Now tap your destination.';
     } else if (!dest) {
       placeDest(e.latlng);
     } else {
@@ -169,36 +170,25 @@
     }
   });
 
-  /* ---------- Route readout ---------- */
+  /* ---------- Distance readout ---------- */
 
-  function syncRouteReadout() {
-    pickupOut.textContent = pickup ? (pickupInput.value || '---') : '---';
-    destOut.textContent = dest ? (destInput.value || '---') : '---';
-    distOut.textContent = distance !== null ? distance + ' km' : '---';
+  /* The two fields are the route readout: renaming one has nothing else to
+     refresh, only the measured distance can change on its own. */
+  function syncDistance() {
+    distOut.textContent = distance !== null ? distance + ' km' : '—';
   }
 
   pickupInput.addEventListener('input', function () {
     if (pickup) pickup.name = this.value;
-    syncRouteReadout();
   });
 
   destInput.addEventListener('input', function () {
     if (dest) dest.name = this.value;
-    syncRouteReadout();
   });
 
   /* ---------- Distance (haversine straight-line) + fare ---------- */
 
-  function haversineKm(a, b) {
-    var R = 6371;
-    var dLat = (b.lat - a.lat) * Math.PI / 180;
-    var dLng = (b.lng - a.lng) * Math.PI / 180;
-    var la1 = a.lat * Math.PI / 180;
-    var la2 = b.lat * Math.PI / 180;
-    var h = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(la1) * Math.cos(la2) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
-    return 2 * R * Math.asin(Math.sqrt(h));
-  }
+  var haversineKm = Track.haversineKm;
 
   function computeFare() {
     if (!pickup || !dest) return null;
@@ -212,7 +202,6 @@
       distance = Number(haversineKm(pickup, dest).toFixed(2));
       fareBoard.classList.remove('hidden');
       fPerKm.textContent = PTB.formatMoney(service.pricePerKm);
-      fDistance.textContent = distance + ' km';
       fPerPax.textContent = PTB.formatMoney(service.pricePerPassenger);
       fPax.textContent = passengers;
       fTotal.textContent = PTB.formatMoney(computeFare());
@@ -221,7 +210,7 @@
       fareBoard.classList.add('hidden');
     }
 
-    syncRouteReadout();
+    syncDistance();
 
     var ready = !!(pickup && dest && distance !== null);
     confirmBtn.disabled = !ready || state.booked;
@@ -229,10 +218,10 @@
     mapHint.textContent = state.booked
       ? ''
       : ready
-        ? 'Everything looks good - confirm your booking below.'
+        ? 'Route set — confirm to book.'
         : pickup
-          ? 'Now tap your destination on the map.'
-          : 'Tap the map to set your pickup point.';
+          ? 'Now tap your destination.'
+          : 'Tap the map to set your pickup.';
   }
 
   /* ---------- Passenger stepper ---------- */
@@ -269,6 +258,20 @@
     clearBtn.disabled = true;
     if (pickupMarker) pickupMarker.dragging.disable();
     if (destMarker) destMarker.dragging.disable();
+
+    /* The form has served its purpose - the result is the only thing to read. */
+    bookingForm.classList.add('hidden');
+    if (pageSub) {
+      pageSub.textContent = 'Your ride is confirmed. Track your driver below.';
+    }
+  }
+
+  /* Keeps pickup / destination / distance / fare readable once the form is gone. */
+  function showTripSummary(booking) {
+    document.getElementById('tsPickup').textContent = booking.pickup;
+    document.getElementById('tsDest').textContent = booking.destination;
+    document.getElementById('tsDistance').textContent = booking.distance;
+    document.getElementById('tsFare').textContent = PTB.formatMoney(booking.totalFare);
   }
 
   /* ---------- Confirm booking ---------- */
@@ -281,6 +284,12 @@
 
     setTimeout(function () {
       var driver = PTB.findDriver(selectedDriverName) || PTB.randomDriver();
+
+      /* Where the driver sets off from and how long the trip takes, decided
+         once here. Every page replays the trip from these, so it carries on
+         while the rider is looking at something else. */
+      var schedule = Track.rideSchedule(pickup);
+
       var booking = {
         bookingId: PTB.uid('bk'),
         userId: user.id,
@@ -299,25 +308,30 @@
         totalFare: fare,
         driverName: driver.name,
         driverPhone: driver.phone,
-        status: 'Active',
+        driverStartLat: schedule.start.lat,
+        driverStartLng: schedule.start.lng,
+        rideMs: Math.round(schedule.rideMs),
+        status: PTB.STATUS.ACTIVE,
         dateTime: new Date().toISOString()
       };
 
       PTB.saveBooking(booking);
       lastBookingId = booking.bookingId;
+      lastDriverName = driver.name;
       overlay.classList.remove('show');
       lockAfterBooking();
+      showTripSummary(booking);
 
       document.getElementById('driverName').textContent = driver.name;
       document.getElementById('driverPhone').textContent = driver.phone;
       document.getElementById('driverInitial').textContent =
         driver.name.split(' ').map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
 
-      document.getElementById('resultArea').classList.remove('hidden');
+      resultArea.classList.remove('hidden');
       mapHint.textContent = '';
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Booking Confirmed';
-      startTracking(driver);
+      startTracking(booking);
     }, 2200);
   });
 
@@ -331,89 +345,14 @@
      cumulative drive distance in meters along the road polyline. */
   var trackToPickup = [];   // driver start -> pickup, road-aware
   var trackLeg1 = 0;        // total meters on the driver -> pickup leg
+  var trackBounds = null;   // start + pickup, kept so a late reveal can re-fit
 
-  var TRACK_MPS = 25;   // simulated driver speed in m/s
-
-  function trackClamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
-
-  function formatTrackDist(m) {
-    return m < 1000 ? Math.round(m) + ' m' : (m / 1000).toFixed(1) + ' km';
-  }
-
-  function etaText(min) {
-    return min < 1 ? 'under a minute' : '~' + min + ' min';
-  }
-
-  /* Convert a lat/lng pair into a flat array usable by OSRM: lng,lat;lng,lat */
-  function osrmCoords(a, b) {
-    return a.lng + ',' + a.lat + ';' + b.lng + ',' + b.lat;
-  }
-
-  /* Request a road-following route from OSRM (free, no key, CORS-enabled).
-     Resolves to an array of {lat,lng,dist} points with cumulative road
-     distance, or null if the request fails or times out. */
-  function fetchOsrmRoute(a, b) {
-    return new Promise(function (resolve) {
-      var settled = false;
-
-      function done(route) {
-        if (!settled) { settled = true; resolve(route); }
-      }
-
-      fetch('https://router.project-osrm.org/route/v1/driving/' +
-        osrmCoords(a, b) + '?overview=full&geometries=geojson')
-        .then(function (res) {
-          if (!res.ok) throw new Error('OSRM bad status');
-          return res.json();
-        })
-        .then(function (data) {
-          var coords = data.routes && data.routes[0] &&
-            data.routes[0].geometry && data.routes[0].geometry.coordinates;
-          if (!coords || !coords.length) throw new Error('OSRM empty route');
-
-          var pts = [];
-          var prev = null;
-          var acc = 0;
-          for (var i = 0; i < coords.length; i++) {
-            var cur = { lat: coords[i][1], lng: coords[i][0] };
-            if (prev) {
-              acc += haversineKm(prev, cur) * 1000;
-            }
-            pts.push({ lat: cur.lat, lng: cur.lng, dist: acc });
-            prev = cur;
-          }
-          /* Make sure the very ends match our picked points exactly so the
-             pins sit on the drawn line. */
-          pts[0].lat = a.lat; pts[0].lng = a.lng; pts[0].dist = 0;
-          var end = pts[pts.length - 1];
-          end.lat = b.lat; end.lng = b.lng;
-          done(pts);
-        })
-        .catch(function () { done(null); });
-
-      /* Don't wait on a stuck request forever */
-      setTimeout(function () { done(null); }, 8000);
-    });
-  }
-
-  /* Straight-line fallback (measured in meters) so tracking still works if
-     OSRM is unreachable or offline. */
-  function straightLeg(a, b) {
-    var pts = [];
-    var steps = 32;
-    for (var s = 0; s <= steps; s++) {
-      var t = s / steps;
-      var cur = {
-        lat: a.lat + (b.lat - a.lat) * t,
-        lng: a.lng + (b.lng - a.lng) * t
-      };
-      cur.dist = haversineKm(a, cur) * 1000;
-      pts.push(cur);
-    }
-    pts[steps].lat = b.lat;
-    pts[steps].lng = b.lng;
-    return pts;
-  }
+  var formatTrackDist = Track.formatDist;
+  var etaText = Track.etaText;
+  var tripProgress = Track.tripProgress;
+  var remainingRideMs = Track.remainingRideMs;
+  var fetchOsrmRoute = Track.fetchRoute;
+  var straightLeg = Track.straightLeg;
 
   function stopTracking() {
     trackActive = false;
@@ -427,21 +366,46 @@
     }
     trackToPickup = [];
     trackLeg1 = 0;
+    trackBounds = null;
   }
 
-  function startTracking(driver) {
+  /* Stage 1 -> 2. The simulation is already running; this only opens the view. */
+  function revealTracking() {
+    var area = document.getElementById('trackingArea');
+    if (area.classList.contains('hidden')) {
+      area.classList.remove('hidden');
+    }
+
+    trackDriverBtn.classList.add('hidden');
+    rideActions.classList.remove('hidden');
+
+    /* The map was built inside a hidden box, so it has no size yet and its
+       viewport is meaningless until it is re-measured and re-fitted. */
+    if (trackMap) {
+      trackMap.invalidateSize();
+      if (trackBounds) trackMap.fitBounds(trackBounds, { padding: [30, 30] });
+    }
+  }
+
+  trackDriverBtn.addEventListener('click', function () {
+    revealTracking();
+    document.getElementById('trackingArea').scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+  });
+
+  function startTracking(booking) {
     stopTracking();
     trackActive = true;
 
-    /* Simulated driver starts somewhere near the pickup point */
-    var start = {
-      lat: trackClamp(pickup.lat + (Math.random() - 0.5) * 0.045, 10.18, 10.44),
-      lng: trackClamp(pickup.lng + (Math.random() - 0.5) * 0.055, 123.75, 124.04)
-    };
-    var pickupPt = { lat: pickup.lat, lng: pickup.lng };
+    /* The driver starts where the booking said he would, not somewhere new, so
+       reopening the page mid-trip shows the same trip. */
+    var start = Track.driverStartOf(booking);
+    var pickupPt = { lat: booking.pickupLat, lng: booking.pickupLng };
 
     var area = document.getElementById('trackingArea');
-    area.classList.remove('hidden');
+    area.classList.add('hidden');
 
     var trackEl = document.getElementById('trackMap');
     trackMap = L.map(trackEl, {
@@ -456,26 +420,15 @@
       maxZoom: 19
     }).addTo(trackMap);
 
-    var routeBounds = L.latLngBounds([
+    trackBounds = L.latLngBounds([
       L.latLng(start.lat, start.lng),
       L.latLng(pickupPt.lat, pickupPt.lng)
     ]);
 
-    setTimeout(function () {
-      trackMap.invalidateSize();
-      trackMap.fitBounds(routeBounds, { padding: [30, 30] });
-    }, 80);
-
     L.marker(pickupPt, { icon: makeIcon('pickup') }).addTo(trackMap);
 
-    var vehicle = service.type === 'motorcycle' ? '🏍' : '🚕';
     var driverMarker = L.marker([start.lat, start.lng], {
-      icon: L.divIcon({
-        className: 'leaflet-pin',
-        html: '<div class="driver-bubble">' + vehicle + '</div>',
-        iconSize: [44, 44],
-        iconAnchor: [22, 22]
-      })
+      icon: Track.vehicleIcon(booking)
     }).addTo(trackMap);
 
     /* Live road-following line from the driver to the pickup */
@@ -499,29 +452,24 @@
     var etaLabel = document.getElementById('trackEtaLabel');
     var badgeEl = document.getElementById('trackBadge');
     var proxEl = document.getElementById('driverProximity');
+    var statusBadge = document.getElementById('statusBadge');
 
     badgeEl.classList.remove('badge-cancelled');
     badgeEl.classList.add('badge-available');
     badgeEl.textContent = '● En Route';
-    subEl.textContent = driver.name + ' is heading to your pickup point.';
-    proxEl.textContent = 'Locating ' + driver.name + '...';
+    subEl.textContent = booking.driverName + ' is heading to your pickup point.';
+    proxEl.textContent = 'Locating ' + booking.driverName + '...';
+
+    /* The trip window is the single clock both this map and the rest of the app
+       read, so the driver is always parked where he really is. */
+    var trip = PTB.rideWindow(booking);
 
     var trackPosition = 0; // current meters traveled
     var trackArrived = false;
 
     /* Represent the driver's progress as an index along the to-pickup route,
        used to (a) move the marker, (b) trim the live line, (c) compute distance. */
-    function driverIndex(route, meters) {
-      var stop = 0;
-      for (var i = 0; i < route.length; i++) {
-        if (route[i].dist >= meters) { stop = i; break; }
-      }
-      if (route[stop].dist < meters) stop = route.length - 1;
-      var lo = Math.max(0, stop - 1);
-      var hi = Math.min(route.length - 1, stop);
-      var span = route[hi].dist - route[lo].dist || 1;
-      return lo + (meters - route[lo].dist) / span;
-    }
+    var driverIndex = Track.indexAt;
 
     function pluck(p) { return [p.lat, p.lng]; }
 
@@ -531,7 +479,7 @@
       driverMarker.setLatLng([d.lat, d.lng]);
 
       var remainM = Math.max(0, trackLeg1 - trackPosition);
-      var eta = etaText(Math.ceil(remainM / TRACK_MPS / 60));
+      var eta = etaText(Math.ceil(remainingRideMs(trip.dueAt, Date.now()) / 60000));
 
       distLabel.textContent = 'Distance to pickup';
       etaLabel.textContent = 'Estimated arrival at pickup';
@@ -544,15 +492,43 @@
         formatTrackDist(remainM) + ' · arrives in ' + eta
       );
 
-      subEl.textContent = driver.name + ' is heading to your pickup point.';
-      proxEl.textContent = driver.name + ' is ' + formatTrackDist(remainM) +
+      subEl.textContent = booking.driverName + ' is heading to your pickup point.';
+      proxEl.textContent = booking.driverName + ' is ' + formatTrackDist(remainM) +
         ' away · arrives in ' + eta;
+    }
+
+    /* Move the driver to wherever the clock says he should be. Called on open
+       as well as on every tick, so returning to the page mid-trip catches the
+       trip up instead of restarting it. */
+    function advance() {
+      var frac = tripProgress(trip.startedAt, trip.dueAt, Date.now());
+      trackPosition = trackLeg1 * frac;
+
+      if (frac >= 1) {
+        arriveAtPickup();
+        return;
+      }
+      updateTracking();
     }
 
     function arriveAtPickup() {
       trackArrived = true;
       clearInterval(trackingTimer);
       trackingTimer = null;
+
+      /* The driver is here. The ride is no longer pending: it leaves the Active
+         list for Completed, and cancelling is closed for good. Arrival is
+         stamped from the schedule, so it is the scheduled arrival even if this
+         page only noticed now. */
+      PTB.completeOnArrival(lastBookingId, new Date(trip.dueAt).toISOString());
+      lockCancelAfterArrival();
+
+      /* Arriving ends the "track your driver" prompt. If the rider never opened
+         the tracking view, surface the history + locked cancel anyway so they
+         are never left without a way out. The tracking map itself stays closed
+         - there is no longer anything to watch. */
+      trackDriverBtn.classList.add('hidden');
+      rideActions.classList.remove('hidden');
 
       /* Park the driver at the pickup point and freeze everything */
       driverMarker.setLatLng([pickupPt.lat, pickupPt.lng]);
@@ -565,37 +541,67 @@
       subEl.textContent = 'Your driver has arrived at your pickup point. 🎉';
       proxEl.textContent = 'Your driver has arrived. 🎉';
       badgeEl.textContent = '● At Pickup';
+
+      /* Keep the booking card honest about where the record went. */
+      statusBadge.classList.remove('badge-available', 'confirming');
+      statusBadge.classList.add('badge-completed');
+      statusBadge.textContent = '● Completed';
     }
 
     trackToPickup = null;
     trackLeg1 = 0;
-    var trackPosition = 0; // current meters traveled
-    var trackArrived = false;
 
     fetchOsrmRoute(start, pickupPt).then(function (route) {
       if (!trackActive) return;
       trackToPickup = route || straightLeg(start, pickupPt);
       trackLeg1 = trackToPickup[trackToPickup.length - 1].dist;
 
-      updateTracking();
+      /* The road shapes the line, the schedule decides the timing, so a slow
+         or missing OSRM call cannot change when the driver turns up. */
+      advance();
+      if (trackArrived) return;
 
       trackingTimer = setInterval(function () {
         if (!trackActive || trackArrived) return;
-        trackPosition += TRACK_MPS;
-
-        if (trackPosition >= trackLeg1) {
-          arriveAtPickup();
-          return;
-        }
-        updateTracking();
+        advance();
       }, 1000);
     });
   }
 
-  /* ---------- Cancel the just-booked ride ---------- */
+  /* ---------- Cancel the just-booked ride / book it again ---------- */
 
-  document.getElementById('cancelBookingBtn').addEventListener('click', function () {
+  var cancelBtn = document.getElementById('cancelBookingBtn');
+
+  /* Shown once the driver is standing at the pickup point. */
+  var ARRIVED_TITLE =
+    'Your driver has already arrived at the pickup point, so this booking can no longer be cancelled.';
+
+  function lockCancelAfterArrival() {
+    cancelBtn.disabled = true;
+    cancelBtn.classList.remove('confirming', 'btn-danger');
+    cancelBtn.textContent = 'Driver Arrived';
+    cancelBtn.title = ARRIVED_TITLE;
+  }
+
+  cancelBtn.addEventListener('click', function () {
+    /* The cancelled ride has already been saved, so this button now means
+       "book again": restart the booking form for the same service + driver. */
+    if (state.cancelled) {
+      location.href = 'booking.html?service=' + encodeURIComponent(service.type) +
+        '&driver=' + encodeURIComponent(lastDriverName);
+      return;
+    }
+
     if (!lastBookingId) return;
+
+    /* Driver already at the pickup: cancelling is closed. */
+    var live = PTB.getBookings(user.id).find(function (b) {
+      return b.bookingId === lastBookingId;
+    });
+    if (!PTB.canCancelBooking(live)) {
+      if (live && PTB.hasDriverArrived(live)) lockCancelAfterArrival();
+      return;
+    }
 
     var badge = document.getElementById('statusBadge');
     if (!badge.classList.contains('confirming')) {
@@ -610,19 +616,25 @@
       return;
     }
 
-    PTB.updateBookingStatus(lastBookingId, 'Cancelled');
+    PTB.updateBookingStatus(lastBookingId, PTB.STATUS.CANCELLED);
     stopTracking();
+
+    /* There is no driver to follow any more, so close the tracking view and the
+       prompt that opens it. History + Book Again stay reachable. */
     document.getElementById('trackingArea').classList.add('hidden');
+    trackDriverBtn.classList.add('hidden');
+    rideActions.classList.remove('hidden');
 
     badge.classList.remove('badge-available', 'confirming');
     badge.classList.add('badge-cancelled');
     badge.textContent = '● Booking Cancelled';
 
-    document.getElementById('successMsg').textContent = '🚫 Booking Cancelled. A new booking was not created.';
-    document.getElementById('successMsg').classList.add('cancelled');
+    document.getElementById('driverProximity').textContent = 'Driver assignment cancelled.';
 
-    var cancelBtn = document.getElementById('cancelBookingBtn');
-    cancelBtn.disabled = true;
-    cancelBtn.textContent = 'Booking Cancelled';
+    state.cancelled = true;
+    cancelBtn.textContent = 'Book Again';
+    cancelBtn.classList.replace('btn-danger', 'btn-primary');
+    cancelBtn.disabled = false;
+    cancelBtn.title = '';
   });
 })();

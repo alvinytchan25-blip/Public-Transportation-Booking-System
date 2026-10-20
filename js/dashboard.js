@@ -9,24 +9,34 @@
   var firstName = user.fullName.split(' ')[0] || 'Rider';
   document.getElementById('userName').textContent = firstName;
 
-  var bookings = PTB.getBookings(user.id);
-  var active = bookings.filter(function (b) {
-    return b.status === 'Active';
-  }).length;
-
-  document.getElementById('statActive').textContent = active;
-  document.getElementById('statTotal').textContent = bookings.length;
-
   var welcomeLine = document.getElementById('welcomeLine');
-  if (active > 0) {
-    welcomeLine.textContent =
-      'You have ' + active + ' active booking' + (active > 1 ? 's' : '') + '. Safe trip!';
+
+  function renderStats() {
+    var active = PTB.getBookingsByStatus(user.id, PTB.STATUS.ACTIVE).length +
+      PTB.getBookingsByStatus(user.id, PTB.STATUS.PENDING).length;
+
+    document.getElementById('statActive').textContent = active;
+    document.getElementById('statCancelled').textContent =
+      PTB.getBookingsByStatus(user.id, PTB.STATUS.CANCELLED).length;
+
+    if (active > 0) {
+      welcomeLine.textContent =
+        'You have ' + active + ' active booking' + (active > 1 ? 's' : '') + '. Safe trip!';
+    }
   }
 
-  var clickables = document.querySelectorAll('.menu-card[data-goto], .stat-card[data-goto]');
-  clickables.forEach(function (el) {
+  renderStats();
+
+  /* A trip can run out while this page is open, so the counts move on their own. */
+  document.addEventListener(PTB.ARRIVED_EVENT, renderStats);
+
+  /* A menu card opens a page; a stat card opens that status of the history. */
+  document.querySelectorAll('[data-goto], [data-status]').forEach(function (el) {
     el.addEventListener('click', function () {
-      location.href = el.getAttribute('data-goto');
+      var status = el.getAttribute('data-status');
+      location.href = status
+        ? PTB.historyUrl(status)
+        : el.getAttribute('data-goto');
     });
   });
 })();

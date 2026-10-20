@@ -9,7 +9,7 @@
 <body>
   <main class="auth-page">
     <section class="auth-card">
-      <h1>Welcome back 👋</h1>
+      <h1>Login</h1>
       <p class="sub">Log in to book your next ride.</p>
 
       <div id="alertError" class="alert alert-error" role="alert"></div>
@@ -33,36 +33,12 @@
         <button type="submit" class="btn btn-primary btn-block btn-lg">Log In</button>
       </form>
 
-      <div class="alert alert-info mt-16">Accounts and bookings are stored locally on this device.</div>
-
       <p class="auth-switch">New here? <a href="register.html">Create an account</a></p>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-head">
-        <div class="footer-brand">
-          <span class="brand-sm">Transpo</span>
-          <p>Your ride, booked in seconds.</p>
-        </div>
-        <nav class="footer-links">
-          <a href="dashboard.html">Home</a>
-          <a href="services.html">Ride</a>
-          <a href="history.html">History</a>
-          <a href="profile.html">Profile</a>
-          <a href="about.html">About Us</a>
-        </nav>
-      </div>
-      <div class="footer-contact">
-        <div class="fc-row"><span class="fc-icon">📞</span><span>+63 966 573 5765</span></div>
-        <div class="fc-row"><span class="fc-icon">📍</span><span>Toledo City, Cebu, Philippines</span></div>
-        <div class="fc-row"><span class="fc-icon">📧</span><span>support@transpo.ph</span></div>
-        <div class="fc-row"><span class="fc-icon">📘</span><a href="https://facebook.com/transpo" target="_blank" rel="noopener">facebook.com/transpo</a></div>
-      </div>
-      <div class="footer-bottom">© <span id="footerYear">2026</span> Transpo. All rights reserved.</div>
-    </div>
-  </footer>
+  <div id="site-footer"></div>
+  <script src="js/footer.js"></script>
 
   <script src="js/storage.js"></script>
   <script>

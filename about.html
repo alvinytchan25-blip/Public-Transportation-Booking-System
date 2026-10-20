@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="js/storage.js"></script>
   <script src="js/nav.js"></script>
+
   <script>
     (function () {
       if (!PTB.getCurrentUser()) {
@@ -17,16 +18,7 @@
 </head>
 <body>
   <div class="app">
-    <header class="topbar">
-      <span class="brand-sm">Transpo</span>
-      <nav class="nav-links">
-        <a href="dashboard.html" class="nav-link">Home</a>
-        <a href="services.html" class="nav-link">Ride</a>
-        <a href="history.html" class="nav-link">History</a>
-        <a href="profile.html" class="nav-link">Profile</a>
-        <a href="about.html" class="nav-link active">About</a>
-      </nav>
-    </header>
+    <div id="site-header"></div>
 
     <section class="hero-card">
       <div class="about-hero-icon">🚗</div>
@@ -118,38 +110,11 @@
         <span class="ad-value">Full history, active status &amp; cancellation</span>
       </div>
     </div>
-
-    <div class="card mt-16">
-      <div class="muted" style="font-size:13.5px; text-align:center">
-        Transpo is a demonstration system. Accounts, fares, and bookings are
-        stored locally in your browser — this system is designed for front-end only, no backend, no database, no internet required.
-      </div>
-    </div>
   </div>
 
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-head">
-        <div class="footer-brand">
-          <span class="brand-sm">Transpo</span>
-          <p>Your ride, booked in seconds.</p>
-        </div>
-        <nav class="footer-links">
-          <a href="dashboard.html">Home</a>
-          <a href="services.html">Ride</a>
-          <a href="history.html">History</a>
-          <a href="profile.html">Profile</a>
-          <a href="about.html">About Us</a>
-        </nav>
-      </div>
-      <div class="footer-contact">
-        <div class="fc-row"><span class="fc-icon">📞</span><span>+63 966 573 5765</span></div>
-        <div class="fc-row"><span class="fc-icon">📍</span><span>Toledo City, Cebu, Philippines</span></div>
-        <div class="fc-row"><span class="fc-icon">📧</span><span>support@transpo.ph</span></div>
-        <div class="fc-row"><span class="fc-icon">📘</span><a href="https://facebook.com/transpo" target="_blank" rel="noopener">facebook.com/transpo</a></div>
-      </div>
-      <div class="footer-bottom">© <span id="footerYear">2026</span> Transpo. All rights reserved.</div>
-    </div>
-  </footer>
+  <div id="site-footer"></div>
+  <script src="js/header.js"></script>
+  <script src="js/footer.js"></script>
+  <script src="js/arrival-notice.js"></script>
 </body>
 </html>

@@ -15,6 +15,18 @@
     taxi: 'Hide Available Taxis'
   };
 
+  /* A driver's standing from finished rides, so it can be read before committing
+     to a booking. Nobody rated yet reads as new rather than as a zero score. */
+  function ratingFor(name) {
+    var r = PTB.driverRating(name);
+    if (!r.count) return '<span class="stars-static">New driver</span>';
+
+    return PTB.formatStars(
+      r.average,
+      r.average.toFixed(1) + ' · ' + r.count
+    );
+  }
+
   function render() {
     listEl.innerHTML = '';
 
@@ -24,7 +36,7 @@
 
       card.innerHTML =
         '<div class="service-head">' +
-          '<div class="service-icon">' + s.icon + '</div>' +
+          '<div class="service-icon ' + s.type + '">' + s.icon + '</div>' +
           '<div style="flex:1">' +
             '<div class="s-name">' + s.name + '</div>' +
             '<div class="s-sub">' + (s.type === 'motorcycle' ? 'Ride on two wheels' : 'Sit back and ride') + '</div>' +
@@ -86,8 +98,11 @@
               '<div class="dp-name">' + d.name + '</div>' +
               '<div class="dp-phone">' + d.phone + '</div>' +
             '</div>' +
-            '<button class="btn btn-accent btn-sm" data-book="' + type + '" data-driver="' +
-              d.name.replace(/"/g, '&quot;') + '">Book Now</button>' +
+            '<div class="dp-rate">' +
+              '<span class="dp-rating">' + ratingFor(d.name) + '</span>' +
+              '<button class="btn btn-accent btn-sm" data-book="' + type + '" data-driver="' +
+                d.name.replace(/"/g, '&quot;') + '">Book Now</button>' +
+            '</div>' +
           '</div>'
         );
       }).join('');

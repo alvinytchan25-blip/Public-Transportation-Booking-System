@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/style.css">
   <script src="js/storage.js"></script>
   <script src="js/nav.js"></script>
+
   <script>
     (function () {
       if (!PTB.getCurrentUser()) {
@@ -17,25 +18,20 @@
 </head>
 <body>
   <div class="app">
-    <header class="topbar">
-      <span class="brand-sm">Transpo</span>
-      <nav class="nav-links">
-        <a href="services.html" class="nav-link">Ride</a>
-        <a href="history.html" class="nav-link">History</a>
-        <a href="profile.html" class="nav-link">Profile</a>
-        <a href="about.html" class="nav-link">About</a>
-      </nav>
-    </header>
+    <div id="site-header"></div>
 
     <section class="hero-card">
       <h2>Hello, <span id="userName">Rider</span>! 👋</h2>
       <p id="welcomeLine">Ready for your next trip?</p>
     </section>
 
-    <div class="page-sub">What would you like to do today?</div>
-
     <div class="menu-grid">
       <div class="menu-card clickable" data-goto="services.html">
+        <span class="menu-icon">📍</span>
+        <div class="menu-label">Quick Book</div>
+        <div class="menu-desc">Start booking right away</div>
+      </div>
+      <div class="menu-card clickable" data-goto="scheduled.html">
         <span class="menu-icon">🏍</span>
         <div class="menu-label">Book a Ride</div>
         <div class="menu-desc">Choose motorcycle or taxi</div>
@@ -50,56 +46,24 @@
         <div class="menu-label">My Profile</div>
         <div class="menu-desc">Edit account details</div>
       </div>
-      <div class="menu-card clickable" data-goto="services.html">
-        <span class="menu-icon">📍</span>
-        <div class="menu-label">Quick Book</div>
-        <div class="menu-desc">Start booking right away</div>
-      </div>
     </div>
 
     <div class="dashboard-stats">
-      <div class="stat-card" data-goto="history.html">
+      <div class="stat-card" data-status="Active">
         <div class="stat-value" id="statActive">0</div>
         <div class="stat-label">Active bookings</div>
       </div>
-      <div class="stat-card" data-goto="history.html">
-        <div class="stat-value" id="statTotal">0</div>
-        <div class="stat-label">Total bookings</div>
-      </div>
-    </div>
-
-    <div class="card mt-16">
-      <div class="muted" style="font-size:13.5px">
-        Your account and bookings are saved in this browser on this device.
-        Logging out keeps your booking history intact.
+      <div class="stat-card" data-status="Cancelled">
+        <div class="stat-value" id="statCancelled">0</div>
+        <div class="stat-label">Cancelled Bookings</div>
       </div>
     </div>
   </div>
 
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-head">
-        <div class="footer-brand">
-          <span class="brand-sm">Transpo</span>
-          <p>Your ride, booked in seconds.</p>
-        </div>
-        <nav class="footer-links">
-          <a href="dashboard.html">Home</a>
-          <a href="services.html">Ride</a>
-          <a href="history.html">History</a>
-          <a href="profile.html">Profile</a>
-          <a href="about.html">About Us</a>
-        </nav>
-      </div>
-      <div class="footer-contact">
-        <div class="fc-row"><span class="fc-icon">📞</span><span>+63 966 573 5765</span></div>
-        <div class="fc-row"><span class="fc-icon">📍</span><span>Toledo City, Cebu, Philippines</span></div>
-        <div class="fc-row"><span class="fc-icon">📧</span><span>support@transpo.ph</span></div>
-        <div class="fc-row"><span class="fc-icon">📘</span><a href="https://facebook.com/transpo" target="_blank" rel="noopener">facebook.com/transpo</a></div>
-      </div>
-      <div class="footer-bottom">© <span id="footerYear">2026</span> Transpo. All rights reserved.</div>
-    </div>
-  </footer>
+  <div id="site-footer"></div>
+  <script src="js/header.js"></script>
+  <script src="js/footer.js"></script>
+  <script src="js/arrival-notice.js"></script>
 
   <script src="js/dashboard.js"></script>
 </body>
